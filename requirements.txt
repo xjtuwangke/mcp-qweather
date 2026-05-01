@@ -1,0 +1,6 @@
+fastmcp>=3.0.0
+httpx
+PyJWT>=2.8.0
+cryptography
+pydantic-settings
+python-dotenv
