@@ -9,6 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
+.env
+
 # Private keys
 keys/*.pem
 !keys/ed25519-public.pem
