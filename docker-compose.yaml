@@ -6,10 +6,10 @@ services:
     container_name: mcp-weather
     ports:
       - "8000:8000"
+    env_file:
+      - path: .env
+        required: true
     environment:
-      - QWEATHER_API_HOST=${QWEATHER_API_HOST}
-      - QWEATHER_KEY_ID=${QWEATHER_KEY_ID}
-      - QWEATHER_PROJECT_ID=${QWEATHER_PROJECT_ID}
       - PRIVATE_KEY_PATH=/run/secrets/private_key.pem
     volumes:
       - ./keys/ed25519-private.pem:/run/secrets/private_key.pem:ro
