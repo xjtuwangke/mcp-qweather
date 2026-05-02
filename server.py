@@ -31,7 +31,7 @@ async def city_resource(location: str, adm: str = None, range: str = None, numbe
         adm: Upper administrative district. Example: "Beijing", "Shaanxi"
         range: Country code (ISO 3166). Example: "cn", "us", "jp"
         number: Number of results (1-20, default 10). Example: 5, 10
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "location": [{"name": "Beijing", "id": "101010100", "lat": "39.91", "lon": "116.39", "adm2": "Beijing", "adm1": "Beijing", "country": "China"}]}
@@ -53,7 +53,7 @@ async def poi_resource(location: str, type: str = "scenic", city: str = None, nu
         type: POI type (default: "scenic"). Example: "scenic", "TSTA" (tide station), "ARPT" (airport)
         city: Limit search to specific city. Example: "Beijing", "101010100"
         number: Number of results (1-20, default 10). Example: 5, 10
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "poi": [{"name": "Beijing Temple", "id": "10101010007A", "lat": "39.94", "lon": "116.41", "type": "scenic", "adm2": "Beijing", "adm1": "Beijing", "country": "China"}]}
@@ -75,7 +75,7 @@ async def poi_range_resource(location: str, type: str = "scenic", radius: int = 
         type: POI type (default: "scenic"). Example: "scenic", "TSTA" (tide station)
         radius: Search radius in km (1-50, default 5). Example: 5, 10, 20
         number: Number of results (1-20, default 10). Example: 5, 10
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "poi": [{"name": "Zhongshan Park", "id": "10101010016A", "lat": "39.91", "lon": "116.39", "type": "scenic", "adm2": "Beijing", "adm1": "Beijing", "country": "China"}]}
@@ -96,7 +96,7 @@ async def weather_now(location: str, lang: str = None, unit: str = None) -> dict
 
     Args:
         location: LocationID (e.g. "101010100", obtained from geo://city/ endpoint) or coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
         unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
     Returns:
@@ -114,7 +114,7 @@ async def weather_daily(location: str, days: str = "7d", lang: str = None, unit:
     Args:
         location: LocationID (e.g. "101010100", obtained from geo://city/ endpoint) or coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
         days: Forecast days (required). Example: "3d", "7d", "10d", "15d", "30d"
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
         unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
     Returns:
@@ -132,7 +132,7 @@ async def weather_hourly(location: str, hours: str = "24h", lang: str = None, un
     Args:
         location: LocationID (e.g. "101010100", obtained from geo://city/ endpoint) or coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
         hours: Forecast hours (required). Example: "24h", "72h", "168h"
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
         unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
     Returns:
@@ -149,7 +149,7 @@ async def grid_weather_now(location: str, lang: str = None, unit: str = None) ->
 
     Args:
         location: Coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
         unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
     Returns:
@@ -167,7 +167,7 @@ async def grid_weather_daily(location: str, days: str = "7d", lang: str = None, 
     Args:
         location: Coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
         days: Forecast days (required). Example: "3d", "7d"
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
         unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
     Returns:
@@ -185,7 +185,7 @@ async def grid_weather_hourly(location: str, hours: str = "24h", lang: str = Non
     Args:
         location: Coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
         hours: Forecast hours (required). Example: "24h", "72h"
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
         unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
     Returns:
@@ -202,7 +202,7 @@ async def minutely_precipitation(location: str, lang: str = None) -> dict:
 
     Args:
         location: Coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "summary": "No precipitation in the next 2 hours", "minutely": [{"fxTime": "2026-05-01T19:05+08:00", "precip": "0.00", "type": "rain"}]}
@@ -223,7 +223,7 @@ async def indices_forecast(location: str, type: str, days: str = "1d", lang: str
               7=UV Index, 8=Air Pollution Diffusion, 9=AC, 10=Allergy,
               11=Sunglasses, 12=Makeup, 13=Drying, 14=Traffic, 15=Fishing, 16=Sunscreen
         days: Forecast days. Example: "1d", "3d"
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "daily": [{"date": "2026-05-01", "type": "3", "name": "Clothing Index", "level": "4", "category": "Moderate", "text": "Wear a light jacket."}]}
@@ -240,7 +240,7 @@ async def air_now(lat: float, lon: float, lang: str = None) -> dict:
     Args:
         lat: Latitude (decimal, up to 2 decimal places). Example: 39.92
         lon: Longitude (decimal, up to 2 decimal places). Example: 116.41
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "indexes": [{"code": "cn-mee", "name": "AQI (CN)", "aqi": 78, "level": "2", "category": "Good"}], "pollutants": [{"code": "pm2p5", "name": "PM2.5", "concentration": {"value": 46.14, "unit": "μg/m³"}}], "stations": [{"id": "P58655", "name": "Wanshou Xigong"}]}
@@ -258,7 +258,7 @@ async def air_hourly(lat: float, lon: float, local_time: bool = None, lang: str 
         lat: Latitude (decimal, up to 2 decimal places). Example: 39.92
         lon: Longitude (decimal, up to 2 decimal places). Example: 116.41
         local_time: Return local time (true/false, default false). Example: True, False
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "hours": [{"forecastTime": "2026-05-01T12:00Z", "indexes": [{"code": "cn-mee", "name": "AQI (CN)", "aqi": 63, "level": "2", "category": "Good"}], "pollutants": []}]}
@@ -276,7 +276,7 @@ async def air_daily(lat: float, lon: float, local_time: bool = None, lang: str =
         lat: Latitude (decimal, up to 2 decimal places). Example: 39.92
         lon: Longitude (decimal, up to 2 decimal places). Example: 116.41
         local_time: Return local time (true/false, default false). Example: True, False
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "days": [{"forecastStartTime": "2026-04-30T16:00Z", "forecastEndTime": "2026-05-01T16:00Z", "indexes": [{"code": "cn-mee", "name": "AQI (CN)", "aqi": 78, "level": "2", "category": "Good"}], "pollutants": []}]}
@@ -292,7 +292,7 @@ async def air_station(location_id: str, lang: str = None) -> dict:
 
     Args:
         location_id: Station LocationID (required). Example: "P53763"
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "pollutants": [{"code": "pm2p5", "name": "PM2.5", "fullName": "Particulate Matter (≤2.5μm)", "concentration": {"value": 27.0, "unit": "μg/m³"}}]}
@@ -309,7 +309,7 @@ async def astronomy_sun(location: str, date: str, lang: str = None) -> dict:
     Args:
         location: LocationID (e.g. "101010100", obtained from geo://city/ endpoint) or coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
         date: Date (required). Example: "20260201" (yyyyMMdd format)
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "sunrise": "2026-05-01T05:16+08:00", "sunset": "2026-05-01T19:08+08:00"}
@@ -326,7 +326,7 @@ async def astronomy_moon(location: str, date: str, lang: str = None) -> dict:
     Args:
         location: LocationID (e.g. "101010100", obtained from geo://city/ endpoint) or coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
         date: Date (required). Example: "20260201" (yyyyMMdd format)
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "moonrise": "2026-05-01T19:04+08:00", "moonset": "2026-05-01T04:40+08:00", "moonPhase": [{"fxTime": "2026-05-01T00:00+08:00", "value": "0.47", "name": "Waxing Gibbous", "illumination": "99", "icon": "803"}]}
@@ -346,7 +346,7 @@ async def solar_elevation_angle(location: str, date: str, time: str, tz: str, al
         time: Time (required). Example: "1230" (HHmm, 24-hour)
         tz: Timezone (required). Example: "0800", "-0530"
         alt: Altitude in meters (required). Example: 43
-        lang: Language. Example: "en", "zh-Hans"
+        lang: Language. Example: "en", "zh"
 
     Returns:
         dict: {"code": "200", "solarElevationAngle": "64.83", "solarAzimuthAngle": "190.55", "solarHour": "1218", "hourAngle": "-4.63"}

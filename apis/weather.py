@@ -18,7 +18,7 @@ class WeatherAPI(QWeatherAPI):
 
         Args:
             location: LocationID or coordinates (required). Example: "101010100", "116.41,39.92"
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
             unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
         Returns:
@@ -39,7 +39,7 @@ class WeatherAPI(QWeatherAPI):
         Args:
             location: LocationID or coordinates (required). Example: "101010100", "116.41,39.92"
             days: Forecast days (required). Example: "3d", "7d", "10d", "15d", "30d"
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
             unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
         Returns:
@@ -60,7 +60,7 @@ class WeatherAPI(QWeatherAPI):
         Args:
             location: LocationID or coordinates (required). Example: "101010100", "116.41,39.92"
             hours: Forecast hours (required). Example: "24h", "72h", "168h"
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
             unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
         Returns:
@@ -80,7 +80,7 @@ class WeatherAPI(QWeatherAPI):
 
         Args:
             location: Coordinates (required). Example: "116.41,39.92" (longitude,latitude)
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
             unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
         Returns:
@@ -101,7 +101,7 @@ class WeatherAPI(QWeatherAPI):
         Args:
             location: Coordinates (required). Example: "116.41,39.92"
             days: Forecast days (required). Example: "3d", "7d"
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
             unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
         Returns:
@@ -122,7 +122,7 @@ class WeatherAPI(QWeatherAPI):
         Args:
             location: Coordinates (required). Example: "116.41,39.92"
             hours: Forecast hours (required). Example: "24h", "72h"
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
             unit: Unit system - "m" for metric, "i" for imperial (default: metric). Example: "m", "i"
 
         Returns:

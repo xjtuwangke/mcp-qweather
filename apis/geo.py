@@ -21,7 +21,7 @@ class GeoAPI(QWeatherAPI):
             adm: Upper administrative district. Example: "Beijing", "Shaanxi"
             range: Country code (ISO 3166). Example: "cn", "us", "jp"
             number: Number of results (1-20, default 10). Example: 5, 10
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "location": [{"name": "Beijing", "id": "101010100", "lat": "39.91", "lon": "116.39", "adm2": "Beijing", "adm1": "Beijing", "country": "China"}]}
@@ -47,7 +47,7 @@ class GeoAPI(QWeatherAPI):
             type: POI type (required). Example: "scenic", "TSTA" (tide station), "ARPT" (airport)
             city: Limit search to specific city. Example: "Beijing", "101010100"
             number: Number of results (1-20, default 10). Example: 5, 10
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "poi": [{"name": "Beijing Temple", "id": "10101010007A", "lat": "39.94", "lon": "116.41", "type": "scenic", "adm2": "Beijing", "adm1": "Beijing", "country": "China"}]}
@@ -71,7 +71,7 @@ class GeoAPI(QWeatherAPI):
             type: POI type (required). Example: "scenic", "TSTA"
             radius: Search radius in km (1-50, default 5). Example: 5, 10, 20
             number: Number of results (1-20, default 10). Example: 5, 10
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "poi": [{"name": "Zhongshan Park", "id": "10101010016A", "lat": "39.91", "lon": "116.39", "type": "scenic", "adm2": "Beijing", "adm1": "Beijing", "country": "China"}]}

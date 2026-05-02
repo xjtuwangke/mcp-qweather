@@ -18,7 +18,7 @@ class MinutelyAPI(QWeatherAPI):
 
         Args:
             location: Coordinates (required). Example: "116.41,39.92" (longitude,latitude)
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "summary": "No precipitation in the next 2 hours", "minutely": [{"fxTime": "2026-05-01T19:05+08:00", "precip": "0.00", "type": "rain"}]}
@@ -40,7 +40,7 @@ class MinutelyAPI(QWeatherAPI):
                   7=UV Index, 8=Air Pollution Diffusion, 9=AC, 10=Allergy,
                   11=Sunglasses, 12=Makeup, 13=Drying, 14=Traffic, 15=Fishing, 16=Sunscreen
             days: Forecast days. Example: "1d", "3d"
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "daily": [{"date": "2026-05-01", "type": "3", "name": "Clothing Index", "level": "4", "category": "Moderate", "text": "Wear a light jacket."}]}
@@ -62,7 +62,7 @@ class MinutelyAPI(QWeatherAPI):
         Args:
             lat: Latitude (required). Example: 39.92
             lon: Longitude (required). Example: 116.41
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "indexes": [{"code": "cn-mee", "name": "AQI (CN)", "aqi": 78, "level": "2", "category": "Good"}], "pollutants": [{"code": "pm2p5", "name": "PM2.5", "concentration": {"value": 46.14, "unit": "μg/m³"}}], "stations": [{"id": "P58655", "name": "Wanshou Xigong"}]}
@@ -81,7 +81,7 @@ class MinutelyAPI(QWeatherAPI):
             lat: Latitude (required). Example: 39.92
             lon: Longitude (required). Example: 116.41
             local_time: Return local time (true/false, default false). Example: True, False
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "hours": [{"forecastTime": "2026-05-01T12:00Z", "indexes": [{"code": "cn-mee", "name": "AQI (CN)", "aqi": 63, "level": "2", "category": "Good"}], "pollutants": []}]}
@@ -102,7 +102,7 @@ class MinutelyAPI(QWeatherAPI):
             lat: Latitude (required). Example: 39.92
             lon: Longitude (required). Example: 116.41
             local_time: Return local time (true/false, default false). Example: True, False
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "days": [{"forecastStartTime": "2026-04-30T16:00Z", "forecastEndTime": "2026-05-01T16:00Z", "indexes": [{"code": "cn-mee", "name": "AQI (CN)", "aqi": 78, "level": "2", "category": "Good"}], "pollutants": []}]}
@@ -121,7 +121,7 @@ class MinutelyAPI(QWeatherAPI):
 
         Args:
             location_id: Station LocationID (required). Example: "P53763"
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "pollutants": [{"code": "pm2p5", "name": "PM2.5", "fullName": "Particulate Matter (≤2.5μm)", "concentration": {"value": 27.0, "unit": "μg/m³"}}]}
@@ -139,7 +139,7 @@ class MinutelyAPI(QWeatherAPI):
         Args:
             location: LocationID or coordinates (required). Example: "101010100", "116.41,39.92"
             date: Date (required). Example: "20260201" (yyyyMMdd format)
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "sunrise": "2026-05-01T05:16+08:00", "sunset": "2026-05-01T19:08+08:00"}
@@ -157,7 +157,7 @@ class MinutelyAPI(QWeatherAPI):
         Args:
             location: LocationID or coordinates (required). Example: "101010100", "116.41,39.92"
             date: Date (required). Example: "20260201" (yyyyMMdd format)
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "moonrise": "2026-05-01T19:04+08:00", "moonset": "2026-05-01T04:40+08:00", "moonPhase": [{"fxTime": "2026-05-01T00:00+08:00", "value": "0.47", "name": "Waxing Gibbous", "illumination": "99", "icon": "803"}]}
@@ -178,7 +178,7 @@ class MinutelyAPI(QWeatherAPI):
             time: Time (required). Example: "1230" (HHmm, 24-hour)
             tz: Timezone (required). Example: "0800", "-0530"
             alt: Altitude in meters (required). Example: 43
-            lang: Language. Example: "en", "zh-Hans"
+            lang: Language. Example: "en", "zh"
 
         Returns:
             dict: {"code": "200", "solarElevationAngle": "64.83", "solarAzimuthAngle": "190.55", "solarHour": "1218", "hourAngle": "-4.63"}
