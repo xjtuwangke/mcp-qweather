@@ -46,8 +46,9 @@ class QWeatherAPI:
             "Authorization": f"Bearer {self.generate_jwt()}",
             "Accept-Encoding": "gzip"
         }
+        logger.info(f"GET {url} params={params}")
         async with httpx.AsyncClient() as client:
             response = await client.get(url, headers=headers, params=params)
-            logger.info(f"GET {response.request.url}")
+            logger.info(f"GET {response.request.url} status={response.status_code}")
             response.raise_for_status()
             return response.json()
