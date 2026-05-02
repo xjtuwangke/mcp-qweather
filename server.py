@@ -337,6 +337,6 @@ async def solar_elevation_angle(location: str, date: str, time: str, tz: str, al
 if __name__ == "__main__":
     import sys
     if "--http" in sys.argv:
-        mcp.run(transport="http", host="0.0.0.0", port=8000, show_banner=True)
+        mcp.run(transport="streamable-http", host="0.0.0.0", port=8000, show_banner=True)
     else:
         mcp.run(transport="stdio")
