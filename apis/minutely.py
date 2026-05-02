@@ -1,6 +1,6 @@
 import logging
 
-from apis.base import QWeatherAPI
+from apis.base import QWeatherAPI, validate_lang
 
 logger = logging.getLogger(__name__)
 
@@ -24,6 +24,7 @@ class MinutelyAPI(QWeatherAPI):
             dict: {"code": "200", "summary": "No precipitation in the next 2 hours", "minutely": [{"fxTime": "2026-05-01T19:05+08:00", "precip": "0.00", "type": "rain"}]}
         """
         params = {"location": location}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request("/v7/minutely/5m", params)
@@ -50,6 +51,7 @@ class MinutelyAPI(QWeatherAPI):
             path = f"/v7/indices/{days}"
         else:
             path = "/v7/indices/1d"
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request(path, params)
@@ -68,6 +70,7 @@ class MinutelyAPI(QWeatherAPI):
             dict: {"code": "200", "indexes": [{"code": "cn-mee", "name": "AQI (CN)", "aqi": 78, "level": "2", "category": "Good"}], "pollutants": [{"code": "pm2p5", "name": "PM2.5", "concentration": {"value": 46.14, "unit": "μg/m³"}}], "stations": [{"id": "P58655", "name": "Wanshou Xigong"}]}
         """
         params = {}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request(f"/airquality/v1/current/{lat}/{lon}", params)
@@ -89,6 +92,7 @@ class MinutelyAPI(QWeatherAPI):
         params = {}
         if local_time is not None:
             params["localTime"] = "true" if local_time else "false"
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request(f"/airquality/v1/hourly/{lat}/{lon}", params)
@@ -110,6 +114,7 @@ class MinutelyAPI(QWeatherAPI):
         params = {}
         if local_time is not None:
             params["localTime"] = "true" if local_time else "false"
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request(f"/airquality/v1/daily/{lat}/{lon}", params)
@@ -127,6 +132,7 @@ class MinutelyAPI(QWeatherAPI):
             dict: {"code": "200", "pollutants": [{"code": "pm2p5", "name": "PM2.5", "fullName": "Particulate Matter (≤2.5μm)", "concentration": {"value": 27.0, "unit": "μg/m³"}}]}
         """
         params = {}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request(f"/airquality/v1/station/{location_id}", params)
@@ -145,6 +151,7 @@ class MinutelyAPI(QWeatherAPI):
             dict: {"code": "200", "sunrise": "2026-05-01T05:16+08:00", "sunset": "2026-05-01T19:08+08:00"}
         """
         params = {"location": location, "date": date}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request("/v7/astronomy/sun", params)
@@ -163,6 +170,7 @@ class MinutelyAPI(QWeatherAPI):
             dict: {"code": "200", "moonrise": "2026-05-01T19:04+08:00", "moonset": "2026-05-01T04:40+08:00", "moonPhase": [{"fxTime": "2026-05-01T00:00+08:00", "value": "0.47", "name": "Waxing Gibbous", "illumination": "99", "icon": "803"}]}
         """
         params = {"location": location, "date": date}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request("/v7/astronomy/moon", params)
@@ -184,6 +192,7 @@ class MinutelyAPI(QWeatherAPI):
             dict: {"code": "200", "solarElevationAngle": "64.83", "solarAzimuthAngle": "190.55", "solarHour": "1218", "hourAngle": "-4.63"}
         """
         params = {"location": location, "date": date, "time": time, "tz": tz, "alt": int(alt)}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request("/v7/astronomy/solar-elevation-angle", params)

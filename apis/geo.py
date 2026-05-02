@@ -1,6 +1,6 @@
 import logging
 
-from apis.base import QWeatherAPI
+from apis.base import QWeatherAPI, validate_lang
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +33,7 @@ class GeoAPI(QWeatherAPI):
             params["range"] = range
         if number:
             params["number"] = number
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request("/geo/v2/city/lookup", params)
@@ -57,6 +58,7 @@ class GeoAPI(QWeatherAPI):
             params["city"] = city
         if number:
             params["number"] = number
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request("/geo/v2/poi/lookup", params)
@@ -79,6 +81,7 @@ class GeoAPI(QWeatherAPI):
         params = {"location": location, "type": type, "radius": radius}
         if number:
             params["number"] = number
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         return await self._request("/geo/v2/poi/range", params)

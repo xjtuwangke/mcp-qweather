@@ -10,6 +10,16 @@ from config import settings
 logger = logging.getLogger(__name__)
 
 
+def validate_lang(lang: str = None) -> str:
+    """Validate and normalize language parameter."""
+    if lang is None:
+        return None
+    lang_lower = lang.lower()
+    if lang_lower in ("zh-hans", "zh-hant", "zh"):
+        return "zh"
+    return "en"
+
+
 class QWeatherAPI:
     """
     Base class for QWeather API clients.

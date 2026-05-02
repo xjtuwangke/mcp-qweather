@@ -357,7 +357,7 @@ async def solar_elevation_angle(location: str, date: str, time: str, tz: str, al
 
 if __name__ == "__main__":
     import sys
-    logging.basicConfig(level=logging.INFO, format="%(name)s - %(message)s")
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
     if "--http" in sys.argv:
         mcp.run(transport="streamable-http", host="0.0.0.0", port=8000, show_banner=True)
     else:

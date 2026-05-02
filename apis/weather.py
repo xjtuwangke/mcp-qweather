@@ -1,6 +1,6 @@
 import logging
 
-from apis.base import QWeatherAPI
+from apis.base import QWeatherAPI, validate_lang
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +25,7 @@ class WeatherAPI(QWeatherAPI):
             dict: {"code": "200", "now": {"obsTime": "2026-05-01T19:00+08:00", "temp": "20", "feelsLike": "17", "icon": "104", "text": "Cloudy", "windDir": "Southeast", "windScale": "2", "windSpeed": "7", "humidity": "36", "precip": "0.0", "pressure": "1005", "vis": "18"}}
         """
         params = {"location": location}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         if unit:
@@ -46,6 +47,7 @@ class WeatherAPI(QWeatherAPI):
             dict: {"code": "200", "daily": [{"fxDate": "2026-05-01", "sunrise": "05:16", "sunset": "19:08", "moonrise": "19:04", "moonset": "04:40", "moonPhase": "Waxing Gibbous", "tempMax": "26", "tempMin": "14", "iconDay": "101", "textDay": "Cloudy", "iconNight": "104", "textNight": "Cloudy", "windDirDay": "East", "windScaleDay": "1-3", "precip": "0.0", "uvIndex": "8"}]}
         """
         params = {"location": location}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         if unit:
@@ -67,6 +69,7 @@ class WeatherAPI(QWeatherAPI):
             dict: {"code": "200", "hourly": [{"fxTime": "2026-05-01T20:00+08:00", "temp": "20", "icon": "104", "text": "Cloudy", "windDir": "Southeast", "windScale": "1-3", "windSpeed": "14", "humidity": "31", "pop": "0", "precip": "0.0"}]}
         """
         params = {"location": location}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         if unit:
@@ -87,6 +90,7 @@ class WeatherAPI(QWeatherAPI):
             dict: {"code": "200", "now": {"obsTime": "2026-05-01T11:00+00:00", "temp": "20", "feelsLike": "18", "icon": "151", "text": "Few Clouds", "windDir": "Southeast", "windScale": "2", "windSpeed": "11", "humidity": "31", "precip": "0.0", "pressure": "1004"}}
         """
         params = {"location": location}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         if unit:
@@ -108,6 +112,7 @@ class WeatherAPI(QWeatherAPI):
             dict: {"code": "200", "daily": [{"fxDate": "2026-05-01", "tempMax": "27", "tempMin": "14", "iconDay": "102", "textDay": "Few Clouds", "iconNight": "152", "textNight": "Few Clouds", "windDirDay": "Southeast", "windScaleDay": "2", "precip": "0.00"}]}
         """
         params = {"location": location}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         if unit:
@@ -129,6 +134,7 @@ class WeatherAPI(QWeatherAPI):
             dict: {"code": "200", "hourly": [{"fxTime": "2026-05-01T12:00+00:00", "temp": "19", "icon": "151", "text": "Few Clouds", "windDir": "Southeast", "windScale": "2", "windSpeed": "9", "humidity": "33", "precip": "0.0"}]}
         """
         params = {"location": location}
+        lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
         if unit:
