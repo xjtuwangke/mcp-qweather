@@ -1,7 +1,14 @@
+import os
+os.environ.setdefault("TZ", os.environ.get("TZ", "Asia/Shanghai"))
+
 import logging
 import sys
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+)
 
 from fastmcp import FastMCP
 

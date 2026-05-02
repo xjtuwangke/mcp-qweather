@@ -11,6 +11,7 @@ services:
         required: true
     environment:
       - PRIVATE_KEY_PATH=/run/secrets/private_key.pem
+      - TZ=${TZ:-Asia/Shanghai}
     volumes:
       - ./keys/ed25519-private.pem:/run/secrets/private_key.pem:ro
     restart: unless-stopped
