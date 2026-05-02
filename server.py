@@ -18,17 +18,14 @@ weather_api = WeatherAPI()
 minutely_api = MinutelyAPI()
 
 # =============================================================================
-# RESOURCES - Static/reference data (Geo lookups)
+# TOOLS - Geo lookups as tools for consistency
 # =============================================================================
 
 
-@mcp.resource("geo://city/{location}")
-async def city_resource(location: str, adm: str = None, range: str = None, number: int = 10, lang: str = None) -> dict:
+@mcp.tool()
+async def city_lookup(location: str, adm: str = None, range: str = None, number: int = 10, lang: str = None) -> dict:
     """
     City search by name or coordinates.
-
-    URI: geo://city/{location}?adm={adm}&range={range}&number={number}&lang={lang}
-    Example: geo://city/Beijing
 
     Args:
         location: City name (e.g. "Beijing") or coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
@@ -40,17 +37,14 @@ async def city_resource(location: str, adm: str = None, range: str = None, numbe
     Returns:
         dict: {"code": "200", "location": [{"name": "Beijing", "id": "101010100", "lat": "39.91", "lon": "116.39", "adm2": "Beijing", "adm1": "Beijing", "country": "China"}]}
     """
-    logger.info(f"[resource] geo://city/{location}?adm={adm}&range={range}&number={number}&lang={lang}")
+    logger.info(f"[tool] city_lookup(location={location!r}, adm={adm!r}, range={range!r}, number={number!r}, lang={lang!r})")
     return await geo_api.city_lookup(location, adm, range, number, lang)
 
 
-@mcp.resource("geo://poi/{location}")
-async def poi_resource(location: str, type: str = "scenic", city: str = None, number: int = 10, lang: str = None) -> dict:
+@mcp.tool()
+async def poi_lookup(location: str, type: str = "scenic", city: str = None, number: int = 10, lang: str = None) -> dict:
     """
     POI (Points of Interest) search by keyword or coordinates.
-
-    URI: geo://poi/{location}?type={type}&city={city}&number={number}&lang={lang}
-    Example: geo://poi/Beijing?type=scenic
 
     Args:
         location: Location name (e.g. "Beijing") or coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.41,39.92").
@@ -62,17 +56,14 @@ async def poi_resource(location: str, type: str = "scenic", city: str = None, nu
     Returns:
         dict: {"code": "200", "poi": [{"name": "Beijing Temple", "id": "10101010007A", "lat": "39.94", "lon": "116.41", "type": "scenic", "adm2": "Beijing", "adm1": "Beijing", "country": "China"}]}
     """
-    logger.info(f"[resource] geo://poi/{location}?type={type}&city={city}&number={number}&lang={lang}")
+    logger.info(f"[tool] poi_lookup(location={location!r}, type={type!r}, city={city!r}, number={number!r}, lang={lang!r})")
     return await geo_api.poi_lookup(location, type, city, number, lang)
 
 
-@mcp.resource("geo://poi/range/{location}")
-async def poi_range_resource(location: str, type: str = "scenic", radius: int = 5, number: int = 10, lang: str = None) -> dict:
+@mcp.tool()
+async def poi_range(location: str, type: str = "scenic", radius: int = 5, number: int = 10, lang: str = None) -> dict:
     """
     POI search within a radius of specified coordinates.
-
-    URI: geo://poi/range/{location}?type={type}&radius={radius}&number={number}&lang={lang}
-    Example: geo://poi/range/116.41,39.92?type=scenic&radius=5
 
     Args:
         location: Coordinates in longitude,latitude format (decimal, up to 2 decimal places, e.g. "116.40528,39.90498").
@@ -84,7 +75,7 @@ async def poi_range_resource(location: str, type: str = "scenic", radius: int = 
     Returns:
         dict: {"code": "200", "poi": [{"name": "Zhongshan Park", "id": "10101010016A", "lat": "39.91", "lon": "116.39", "type": "scenic", "adm2": "Beijing", "adm1": "Beijing", "country": "China"}]}
     """
-    logger.info(f"[resource] geo://poi/range/{location}?type={type}&radius={radius}&number={number}&lang={lang}")
+    logger.info(f"[tool] poi_range(location={location!r}, type={type!r}, radius={radius!r}, number={number!r}, lang={lang!r})")
     return await geo_api.poi_range(location, type, radius, number, lang)
 
 

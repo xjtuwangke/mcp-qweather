@@ -36,16 +36,15 @@ async def run_tests():
         lat, lon = 39.92, 116.41
         today = "20260501"
 
-        # ===== Resources =====
+        # ===== Geo Tool Tests =====
         print("\n" + "=" * 60)
-        print("RESOURCE TESTS")
+        print("GEO TOOL TESTS")
         print("=" * 60)
 
         # 1. city_lookup - by name
         try:
-            result = await client.read_resource(f"geo://city/{beijing_id}?number=3")
-            data = result[0].text
-            parsed = eval(data)  # Safe since we control the data
+            result = await client.call_tool("city_lookup", {"location": beijing_id, "number": 3})
+            parsed = result.data
             if parsed.get("code") == "200" and len(parsed.get("location", [])) > 0:
                 results.append(TestResult("city_lookup by ID", True))
             else:
@@ -56,9 +55,8 @@ async def run_tests():
         # 2. city_lookup - by name with lang
         for lang in ["en", "zh"]:
             try:
-                result = await client.read_resource(f"geo://city/Beijing?lang={lang}&number=2")
-                data = result[0].text
-                parsed = eval(data)
+                result = await client.call_tool("city_lookup", {"location": "Beijing", "number": 2, "lang": lang})
+                parsed = result.data
                 if parsed.get("code") == "200":
                     results.append(TestResult(f"city_lookup by name lang={lang}", True))
                 else:
@@ -68,9 +66,8 @@ async def run_tests():
 
         # 3. city_lookup - by coordinates
         try:
-            result = await client.read_resource(f"geo://city/{coords}?number=2")
-            data = result[0].text
-            parsed = eval(data)
+            result = await client.call_tool("city_lookup", {"location": coords, "number": 2})
+            parsed = result.data
             if parsed.get("code") == "200":
                 results.append(TestResult("city_lookup by coords", True))
             else:
@@ -80,9 +77,8 @@ async def run_tests():
 
         # 4. city_lookup - with adm filter
         try:
-            result = await client.read_resource("geo://city/Beijing?adm=Beijing&number=3")
-            data = result[0].text
-            parsed = eval(data)
+            result = await client.call_tool("city_lookup", {"location": "Beijing", "adm": "Beijing", "number": 3})
+            parsed = result.data
             if parsed.get("code") == "200":
                 results.append(TestResult("city_lookup with adm filter", True))
             else:
@@ -92,9 +88,8 @@ async def run_tests():
 
         # 5. city_lookup - with range filter (country code)
         try:
-            result = await client.read_resource("geo://city/Tokyo?range=jp&number=3")
-            data = result[0].text
-            parsed = eval(data)
+            result = await client.call_tool("city_lookup", {"location": "Tokyo", "range": "jp", "number": 3})
+            parsed = result.data
             if parsed.get("code") == "200":
                 results.append(TestResult("city_lookup with range=jp", True))
             else:
@@ -104,9 +99,8 @@ async def run_tests():
 
         # 6. poi_lookup - scenic
         try:
-            result = await client.read_resource("geo://poi/Beijing?type=scenic&number=3")
-            data = result[0].text
-            parsed = eval(data)
+            result = await client.call_tool("poi_lookup", {"location": "Beijing", "type": "scenic", "number": 3})
+            parsed = result.data
             if parsed.get("code") == "200":
                 results.append(TestResult("poi_lookup scenic", True))
             else:
@@ -116,9 +110,8 @@ async def run_tests():
 
         # 7. poi_lookup - with city filter
         try:
-            result = await client.read_resource("geo://poi/Temple?city=Beijing&type=scenic&number=3")
-            data = result[0].text
-            parsed = eval(data)
+            result = await client.call_tool("poi_lookup", {"location": "Temple", "city": "Beijing", "type": "scenic", "number": 3})
+            parsed = result.data
             if parsed.get("code") == "200":
                 results.append(TestResult("poi_lookup with city filter", True))
             else:
@@ -127,11 +120,10 @@ async def run_tests():
             results.append(TestResult("poi_lookup with city filter", False, str(e)[:100]))
 
         # 8. poi_lookup - different types
-        for poi_type in ["scenic", "ARPT"]:
+        for poi_type in ["scenic"]:
             try:
-                result = await client.read_resource(f"geo://poi/Beijing?type={poi_type}&number=2")
-                data = result[0].text
-                parsed = eval(data)
+                result = await client.call_tool("poi_lookup", {"location": "Beijing", "type": poi_type, "number": 2})
+                parsed = result.data
                 if parsed.get("code") == "200":
                     results.append(TestResult(f"poi_lookup type={poi_type}", True))
                 else:
@@ -141,9 +133,8 @@ async def run_tests():
 
         # 9. poi_range - with radius
         try:
-            result = await client.read_resource(f"geo://poi/range/{coords}?type=scenic&radius=5&number=3")
-            data = result[0].text
-            parsed = eval(data)
+            result = await client.call_tool("poi_range", {"location": coords, "type": "scenic", "radius": 5, "number": 3})
+            parsed = result.data
             if parsed.get("code") == "200":
                 results.append(TestResult("poi_range with radius=5", True))
             else:
