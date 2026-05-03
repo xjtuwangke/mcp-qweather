@@ -187,7 +187,7 @@ class MinutelyAPI(QWeatherAPI):
         Returns:
             dict: {"code": "200", "solarElevationAngle": "64.83", "solarAzimuthAngle": "190.55", "solarHour": "1218", "hourAngle": "-4.63"}
         """
-        params = {"location": location, "date": date, "time": time, "tz": tz, "alt": alt}
+        params = {"location": location, "date": date, "time": time, "tz": tz, "alt": round(alt)}
         lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
