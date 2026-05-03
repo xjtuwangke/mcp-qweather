@@ -72,6 +72,16 @@ QWeatherAPI (apis/base.py)
 3. `QWeatherAPI.generate_jwt()` creates EdDSA-signed JWT with 15-min expiry
 4. Token cached until 60s before expiry, refreshed automatically
 
+**Note**: PyJWT automatically adds `typ: "JWT"` to the token header. This is compliant with QWeather's current JWT spec but is a reserved field per the [authentication docs](https://dev.qweather.com/docs/configuration/authentication/#json-web-token).
+
+### Key QWeather Documentation
+
+- [Authentication (JWT)](https://dev.qweather.com/docs/configuration/authentication/)
+- [Error Codes](https://dev.qweather.com/docs/resource/error-code/) — v1 and v2 formats handled
+- [Caching Best Practices](https://dev.qweather.com/docs/best-practices/cache/)
+- [No Assumptions](https://dev.qweather.com/docs/best-practices/no-assumptions/) — never assume data completeness
+- [Gzip Handling](https://dev.qweather.com/docs/best-practices/gzip/) — enabled on all requests
+
 ### Configuration (`config.py`)
 
 Uses `pydantic-settings` with `BaseSettings`. Reads from `.env` file automatically.
