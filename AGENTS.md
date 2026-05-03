@@ -1,0 +1,138 @@
+# AGENTS.md — MCP QWeather Server
+
+## Project Overview
+
+A **Weather MCP (Model Context Protocol) Server** built with **FastMCP** that wraps the **QWeather (和风天气) API** into standardized MCP tools for AI assistants (Claude, etc.).
+
+- **Language**: Python 3.13+
+- **Package manager**: uv
+- **Framework**: FastMCP
+- **License**: MIT
+
+## Project Structure
+
+```
+.
+├── apis/                        # Core API client library
+│   ├── __init__.py              # Exports GeoAPI only
+│   ├── base.py                  # QWeatherAPI base class, JWT auth, 17 validators
+│   ├── geo.py                   # GeoAPI — city_lookup, poi_lookup, poi_range
+│   ├── weather.py               # WeatherAPI — 6 weather endpoints (now/daily/hourly/grid)
+│   ├── minutely.py              # MinutelyAPI — precipitation, AQI, astronomy, indices
+│   └── schemas.py               # Empty placeholder for Pydantic models
+├── keys/
+│   ├── ed25519-public.pem       # Ed25519 public key (committed)
+│   └── ed25519-private.pem      # Private key (gitignored)
+├── tests/
+│   └── test_api.py              # ~37 test cases using fastmcp.Client + PythonStdioTransport
+├── server.py                    # MCP server entry point — 15 tools, 2 transport modes
+├── config.py                    # pydantic-settings configuration from .env
+├── test_client.py               # Simple MCP client example (outdated)
+├── pyproject.toml               # uv project config, 6 deps
+├── uv.lock                      # Locked dependency versions
+├── Dockerfile                   # Python 3.13-slim, HTTP mode
+├── docker-compose.yaml          # Port 28001:8000, secret mount, .env
+├── docker-run.sh                # 203-line bash deploy script
+├── .env.example                 # Environment variable template
+└── .gitignore                   # Excludes __pycache__, .venv, .env, private keys
+```
+
+## Commands
+
+| Command | Purpose |
+|---------|---------|
+| `uv sync` | Install dependencies |
+| `uv run python server.py` | Run server in **stdio mode** |
+| `uv run python server.py --http` | Run server in **HTTP mode** (0.0.0.0:8000) |
+| `uv run python tests/test_api.py` | Run full test suite (~37 tests) |
+| `./docker-run.sh --detach` | Build & run Docker container |
+| `docker-compose up -d` | Run via Docker Compose |
+
+## Architecture
+
+### Transport Modes
+
+- **Stdio** (default): `mcp.run(transport="stdio")` — for local MCP clients
+- **HTTP**: `mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)` — for remote access / Docker
+
+### API Client Hierarchy
+
+```
+QWeatherAPI (apis/base.py)
+├── GeoAPI (apis/geo.py)       — city/POI search
+├── WeatherAPI (apis/weather.py) — weather now/daily/hourly/grid
+└── MinutelyAPI (apis/minutely.py) — precipitation, AQI, astronomy, indices
+```
+
+### JWT Authentication Flow
+
+1. Ed25519 key pair in `keys/` (generated with openssl)
+2. Public key uploaded to QWeather console to create JWT credential
+3. `QWeatherAPI.generate_jwt()` creates EdDSA-signed JWT with 15-min expiry
+4. Token cached until 60s before expiry, refreshed automatically
+
+### Configuration (`config.py`)
+
+Uses `pydantic-settings` with `BaseSettings`. Reads from `.env` file automatically.
+
+| Env Variable | Config Field | Required |
+|---|---|---|
+| `QWEATHER_API_HOST` | `qweather_api_host` | Yes |
+| `PRIVATE_KEY_PATH` | `private_key_path` | No (default: `keys/ed25519-private.pem`) |
+| `QWEATHER_KEY_ID` | `key_id` | Yes |
+| `QWEATHER_PROJECT_ID` | `project_id` | Yes |
+
+### Server Logging
+
+`LoggingFastMCP` (subclass of `FastMCP`, `server.py:61`) overrides `call_tool()` to log every tool invocation including invalid/unknown tools. Both app logger and uvicorn access logger are configured with timestamp format.
+
+### 15 MCP Tools
+
+**Geo (3)**: `city_lookup`, `poi_lookup`, `poi_range`
+**Weather (6)**: `weather_now`, `weather_daily`, `weather_hourly`, `grid_weather_now`, `grid_weather_daily`, `grid_weather_hourly`
+**Minutely/Air/Astro (6)**: `minutely_precipitation`, `indices_forecast`, `air_now`, `air_hourly`, `air_daily`, `air_station`, `astronomy_sun`, `astronomy_moon`, `solar_elevation_angle`
+
+### Input Validation (`apis/base.py`)
+
+All input validation happens at the tool layer (in `server.py` tool decorators), calling validators from `apis/base.py` (lines 64–191). Validators raise `ValueError` with descriptive messages. Key validators:
+
+- `validate_coordinates()` — regex for `lon,lat` format
+- `validate_location_id()` — alphanumeric
+- `validate_days/hours()` — against allowed tuple sets
+- `validate_date()` — yyyyMMdd format
+- `validate_time()` — HHmm (24h)
+- `validate_timezone()` — ±HHmm
+- `validate_number/radius/altitude/latitude/longitude()` — range checks
+- `validate_lang()` — normalizes to "zh" or "en"
+- `validate_unit()` — "m" or "i"
+- `validate_country_code()` — ISO 3166 alpha-2
+
+## Testing
+
+Tests are in `tests/test_api.py` (503 lines). They use `fastmcp.Client` with `PythonStdioTransport` — the test starts the actual MCP server as a subprocess and calls tools via MCP protocol.
+
+Test data: Beijing LocationID `101010100`, coordinates `116.41,39.92`.
+
+Tests are run with: `uv run python tests/test_api.py`
+
+## Code Conventions
+
+- All tool functions are `async def` and return `dict`
+- Parameters use explicit type hints
+- Lang parameter defaults to `None` and is validated to `None`, `"zh"`, or `"en"`
+- Tools accept either LocationID (alphanumeric) or coordinates (`"lon,lat"`) with `is_coordinate_location()` detection
+- Grid weather tools require coordinates only
+- Validators are pure functions, imported and called at the tool layer
+- API methods pass params as-is to `_request()` without extra processing
+- JWT token generation happens in `generate_jwt()`, called from `_request()` with caching
+
+## Dependencies
+
+| Package | Purpose |
+|---------|---------|
+| `fastmcp` | MCP server framework |
+| `httpx` | Async HTTP client for QWeather API |
+| `PyJWT` | (Listed but not used — JWT is manually constructed in `base.py`) |
+| `cryptography` | Ed25519 private key loading and signing |
+| `pydantic-settings` | .env-based configuration |
+| `python-dotenv` | .env file loading |
