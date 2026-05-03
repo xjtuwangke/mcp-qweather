@@ -267,4 +267,7 @@ uv run python tests/test_api.py
 - [Minutely API](https://dev.qweather.com/docs/api/minutely/)
 - [Air Quality API](https://dev.qweather.com/docs/api/air-quality/)
 - [Astronomy API](https://dev.qweather.com/docs/api/astronomy/)
-- [认证文档](https://dev.qweather.com/docs/configuration/authentication/)
+- [认证文档 (JWT)](https://dev.qweather.com/docs/configuration/authentication/)
+- [错误码](https://dev.qweather.com/docs/resource/error-code/)
+- [最佳实践 - 缓存](https://dev.qweather.com/docs/best-practices/cache/)
+- [最佳实践 - 不要假设](https://dev.qweather.com/docs/best-practices/no-assumptions/)
