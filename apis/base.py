@@ -248,7 +248,8 @@ class QWeatherAPI:
     def _get_http_client(self) -> httpx.AsyncClient:
         if self._http_client is None or self._http_client.is_closed:
             self._http_client = httpx.AsyncClient(
-                headers={"Accept-Encoding": "gzip"}
+                headers={"Accept-Encoding": "gzip"},
+                timeout=10.0,
             )
         return self._http_client
 
