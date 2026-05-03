@@ -1,4 +1,5 @@
 import logging
+from typing import Optional
 
 from apis.base import QWeatherAPI, validate_lang
 
@@ -71,7 +72,7 @@ class MinutelyAPI(QWeatherAPI):
             params["lang"] = lang
         return await self._request(f"/airquality/v1/current/{lat}/{lon}", params)
 
-    async def air_hourly(self, lat: float, lon: float, local_time: bool = None, lang: str = None) -> dict:
+    async def air_hourly(self, lat: float, lon: float, local_time: Optional[bool] = None, lang: str = None) -> dict:
         """
         Get hourly air quality forecast (next 24 hours).
         Docs: https://dev.qweather.com/docs/api/air-quality/air-hourly-forecast/
@@ -93,7 +94,7 @@ class MinutelyAPI(QWeatherAPI):
             params["lang"] = lang
         return await self._request(f"/airquality/v1/hourly/{lat}/{lon}", params)
 
-    async def air_daily(self, lat: float, lon: float, local_time: bool = None, lang: str = None) -> dict:
+    async def air_daily(self, lat: float, lon: float, local_time: Optional[bool] = None, lang: str = None) -> dict:
         """
         Get daily air quality forecast (next 3 days).
         Docs: https://dev.qweather.com/docs/api/air-quality/air-daily-forecast/

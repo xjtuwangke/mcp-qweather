@@ -3,6 +3,7 @@ os.environ.setdefault("TZ", os.environ.get("TZ", "Asia/Shanghai"))
 
 import logging
 import sys
+from typing import Optional
 
 logging.basicConfig(
     level=logging.INFO,
@@ -62,7 +63,7 @@ minutely_api = MinutelyAPI()
 
 
 @mcp.tool()
-async def city_lookup(location: str, adm: str = None, range: str = None, number: int = 10, lang: str = None) -> dict:
+async def city_lookup(location: str, adm: Optional[str] = None, range: Optional[str] = None, number: int = 10, lang: Optional[str] = None) -> dict:
     """
     City search by name or coordinates.
 
@@ -314,7 +315,7 @@ async def air_now(lat: float, lon: float, lang: str = None) -> dict:
 
 
 @mcp.tool()
-async def air_hourly(lat: float, lon: float, local_time: bool = None, lang: str = None) -> dict:
+async def air_hourly(lat: float, lon: float, local_time: Optional[bool] = None, lang: str = None) -> dict:
     """
     Get hourly air quality forecast (next 24 hours).
 
@@ -333,7 +334,7 @@ async def air_hourly(lat: float, lon: float, local_time: bool = None, lang: str 
 
 
 @mcp.tool()
-async def air_daily(lat: float, lon: float, local_time: bool = None, lang: str = None) -> dict:
+async def air_daily(lat: float, lon: float, local_time: Optional[bool] = None, lang: str = None) -> dict:
     """
     Get daily air quality forecast (next 3 days).
 

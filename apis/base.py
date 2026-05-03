@@ -5,6 +5,7 @@ import time
 import logging
 import re
 from pathlib import Path
+from typing import Optional
 
 import jwt
 
@@ -16,7 +17,7 @@ logger = logging.getLogger(__name__)
 class QWeatherAPIError(Exception):
     """Exception raised when QWeather API returns an error code."""
 
-    def __init__(self, code: str, message: str = None):
+    def __init__(self, code: str, message: Optional[str] = None):
         self.code = code
         self.message = message or self._default_message(code)
         super().__init__(f"QWeather API error: {self.code} - {self.message}")
@@ -63,7 +64,7 @@ RANGE_DOC = (
 )
 
 
-def validate_lang(lang: str = None) -> str:
+def validate_lang(lang: Optional[str] = None) -> Optional[str]:
     """Validate and normalize language parameter."""
     if lang is None:
         return None
