@@ -304,6 +304,7 @@ class QWeatherAPI:
         )
 
         if response.status_code != 200:
+            self._log_error_response(response)
             self._raise_error(response)
 
         data = response.json()
@@ -316,8 +317,15 @@ class QWeatherAPI:
 
     @staticmethod
     def _raise_error(response):
+        """Raise QWeatherAPIError from an error response.
+
+        Intentionally does NOT retry — per QWeather best practices, blind
+        retries after errors look like DDoS attacks and may cause account
+        suspension. The MCP client should pause and investigate errors.
+
+        See: https://dev.qweather.com/docs/resource/error-code/
+        """
         # Try to extract v2 error format: { "error": { "title", "detail", "status" } }
-        # See: https://dev.qweather.com/docs/resource/error-code/
         try:
             body = response.json()
             error_obj = body.get("error", {})
@@ -339,3 +347,25 @@ class QWeatherAPI:
             code=str(response.status_code),
             message=f"HTTP {response.status_code}: {response.text[:200]}",
         )
+
+    @staticmethod
+    def _log_error_response(response):
+        """Log warning for auth/rate-limit errors that could cause account issues."""
+        status = response.status_code
+        if status == 401:
+            logger.warning(
+                "QWeather authentication failed (401) — check QWEATHER_KEY_ID "
+                "and QWEATHER_PROJECT_ID in .env. Persistent 401 errors may "
+                "result in account suspension."
+            )
+        elif status == 403:
+            logger.warning(
+                "QWeather access denied (403) — verify your account has "
+                "sufficient credit and no overdue payments. Persistent 403 "
+                "errors may result in account suspension."
+            )
+        elif status == 429:
+            logger.warning(
+                "QWeather rate limit exceeded (429) — requests are being "
+                "throttled. Back off and reduce request frequency."
+            )
