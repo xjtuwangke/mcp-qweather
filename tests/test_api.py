@@ -188,7 +188,7 @@ async def run_tests():
                 results.append(TestResult(f"weather_now unit={unit}", False, str(e)[:100]))
 
         # 13. weather_daily - different days
-        for days in ["3d", "7d", "10d", "15d"]:
+        for days in ["3d", "7d", "10d", "15d", "30d"]:
             try:
                 result = await client.call_tool("weather_daily", {"location": beijing_id, "days": days})
                 if result.data.get("code") == "200":
@@ -210,7 +210,7 @@ async def run_tests():
                 results.append(TestResult(f"weather_daily lang={lang}", False, str(e)[:100]))
 
         # 15. weather_hourly - different hours
-        for hours in ["24h", "72h"]:
+        for hours in ["24h", "72h", "168h"]:
             try:
                 result = await client.call_tool("weather_hourly", {"location": beijing_id, "hours": hours})
                 if result.data.get("code") == "200":
@@ -234,6 +234,17 @@ async def run_tests():
             except Exception as e:
                 results.append(TestResult(f"grid_weather_now lang={lang}", False, str(e)[:100]))
 
+        # 16b. grid_weather_now - unit parameter
+        for unit in ["m", "i"]:
+            try:
+                result = await client.call_tool("grid_weather_now", {"location": coords, "unit": unit})
+                if result.data.get("code") == "200":
+                    results.append(TestResult(f"grid_weather_now unit={unit}", True))
+                else:
+                    results.append(TestResult(f"grid_weather_now unit={unit}", False, f"code={result.data.get('code')}"))
+            except Exception as e:
+                results.append(TestResult(f"grid_weather_now unit={unit}", False, str(e)[:100]))
+
         # 17. grid_weather_daily
         for days in ["3d", "7d"]:
             try:
@@ -245,15 +256,38 @@ async def run_tests():
             except Exception as e:
                 results.append(TestResult(f"grid_weather_daily days={days}", False, str(e)[:100]))
 
+        # 17b. grid_weather_daily - unit parameter
+        for unit in ["m", "i"]:
+            try:
+                result = await client.call_tool("grid_weather_daily", {"location": coords, "days": "3d", "unit": unit})
+                if result.data.get("code") == "200":
+                    results.append(TestResult(f"grid_weather_daily unit={unit}", True))
+                else:
+                    results.append(TestResult(f"grid_weather_daily unit={unit}", False, f"code={result.data.get('code')}"))
+            except Exception as e:
+                results.append(TestResult(f"grid_weather_daily unit={unit}", False, str(e)[:100]))
+
         # 18. grid_weather_hourly
-        try:
-            result = await client.call_tool("grid_weather_hourly", {"location": coords, "hours": "24h"})
-            if result.data.get("code") == "200":
-                results.append(TestResult("grid_weather_hourly hours=24h", True))
-            else:
-                results.append(TestResult("grid_weather_hourly hours=24h", False, f"code={result.data.get('code')}"))
-        except Exception as e:
-            results.append(TestResult("grid_weather_hourly hours=24h", False, str(e)[:100]))
+        for hours in ["24h", "72h"]:
+            try:
+                result = await client.call_tool("grid_weather_hourly", {"location": coords, "hours": hours})
+                if result.data.get("code") == "200":
+                    results.append(TestResult(f"grid_weather_hourly hours={hours}", True))
+                else:
+                    results.append(TestResult(f"grid_weather_hourly hours={hours}", False, f"code={result.data.get('code')}"))
+            except Exception as e:
+                results.append(TestResult(f"grid_weather_hourly hours={hours}", False, str(e)[:100]))
+
+        # 18b. grid_weather_hourly - unit parameter
+        for unit in ["m", "i"]:
+            try:
+                result = await client.call_tool("grid_weather_hourly", {"location": coords, "hours": "24h", "unit": unit})
+                if result.data.get("code") == "200":
+                    results.append(TestResult(f"grid_weather_hourly unit={unit}", True))
+                else:
+                    results.append(TestResult(f"grid_weather_hourly unit={unit}", False, f"code={result.data.get('code')}"))
+            except Exception as e:
+                results.append(TestResult(f"grid_weather_hourly unit={unit}", False, str(e)[:100]))
 
         # ===== Minutely/Air/Astronomy Tests =====
         print("\n" + "=" * 60)
