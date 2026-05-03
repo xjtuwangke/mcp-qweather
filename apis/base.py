@@ -2,11 +2,11 @@ import asyncio
 from datetime import datetime
 import httpx
 import time
-import base64
-import json
 import logging
 import re
 from pathlib import Path
+
+import jwt
 
 from config import settings
 
@@ -234,23 +234,12 @@ class QWeatherAPI:
         self._load_private_key()
 
         def _build_token():
-            header_dict = {"alg": "EdDSA", "kid": settings.key_id}
-            header_base64 = base64.urlsafe_b64encode(json.dumps(header_dict).encode()).decode().rstrip("=")
-
-            iat = int(now) - 30
-            exp = int(now) + 900
-            payload_dict = {
-                "iat": iat,
-                "exp": exp,
-                "sub": settings.project_id
-            }
-            body_base64 = base64.urlsafe_b64encode(json.dumps(payload_dict).encode()).decode().rstrip("=")
-
-            signing_input = f"{header_base64}.{body_base64}"
-            signature = self._private_key.sign(signing_input.encode())
-            signature_base64 = base64.urlsafe_b64encode(signature).decode().rstrip("=")
-
-            return f"{signing_input}.{signature_base64}"
+            return jwt.encode(
+                {"iat": int(now) - 30, "exp": int(now) + 900, "sub": settings.project_id},
+                self._private_key,
+                algorithm="EdDSA",
+                headers={"alg": "EdDSA", "kid": settings.key_id},
+            )
 
         self._jwt_token = await asyncio.to_thread(_build_token)
         self._jwt_expiry = int(now) + 900
