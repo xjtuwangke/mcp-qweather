@@ -39,25 +39,6 @@ from apis.base import (
 logger = logging.getLogger(__name__)
 
 
-class LoggingMiddleware:
-    """Middleware to log all tool call attempts including unknown tools."""
-
-    def __init__(self, app):
-        self.app = app
-
-    async def __call__(self, context, call_next):
-        if hasattr(context.message, 'name'):
-            tool_name = context.message.name
-            tool_args = getattr(context.message, 'arguments', {}) or {}
-            logger.info(f"[tool] {tool_name}({tool_args})")
-        try:
-            return await call_next(context)
-        except NotFoundError:
-            if hasattr(context.message, 'name'):
-                logger.error(f"[tool] {context.message.name} - tool not found")
-            raise
-
-
 class LoggingFastMCP(FastMCP):
     """FastMCP subclass that logs all tool calls including unknown tools."""
 

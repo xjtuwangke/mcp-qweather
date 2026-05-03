@@ -199,7 +199,6 @@ class QWeatherAPI:
 
     _jwt_token: str = None
     _jwt_expiry: float = 0
-    _jwt_lock_created: bool = False
 
     def __init__(self, api_host: str = None):
         self.api_host = api_host or settings.qweather_api_host
