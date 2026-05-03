@@ -1,4 +1,5 @@
 import asyncio
+from datetime import datetime
 import httpx
 import time
 import base64
@@ -120,6 +121,10 @@ def validate_date(value: str) -> str:
     """Validate date in yyyyMMdd format."""
     if not re.match(r"^\d{8}$", value):
         raise ValueError(f"Invalid date format: '{value}'. Expected 'yyyyMMdd' (e.g. '20260201')")
+    try:
+        datetime.strptime(value, "%Y%m%d")
+    except ValueError:
+        raise ValueError(f"Invalid date: '{value}'. Not a valid calendar date")
     return value
 
 
