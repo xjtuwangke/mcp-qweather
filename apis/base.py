@@ -297,7 +297,11 @@ class QWeatherAPI:
         logger.info(f"GET {url} params={params}")
         client = self._get_http_client()
         response = await client.get(url, headers=headers, params=params)
-        logger.info(f"GET {response.request.url} status={response.status_code}")
+        response_body = response.text[:1000]
+        logger.info(
+            f"GET {response.request.url} status={response.status_code} "
+            f"body={response_body}"
+        )
 
         if response.status_code != 200:
             self._raise_error(response)
