@@ -560,7 +560,6 @@ dependencies = [
     { name = "fastmcp" },
     { name = "httpx" },
     { name = "pydantic-settings" },
-    { name = "pyjwt" },
     { name = "python-dotenv" },
 ]
 
@@ -570,7 +569,6 @@ requires-dist = [
     { name = "fastmcp", specifier = ">=3.0.0" },
     { name = "httpx" },
     { name = "pydantic-settings" },
-    { name = "pyjwt", specifier = ">=2.8.0" },
     { name = "python-dotenv" },
 ]
 
