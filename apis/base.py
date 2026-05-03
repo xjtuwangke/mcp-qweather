@@ -135,9 +135,17 @@ def validate_time(value: str) -> str:
 
 def validate_timezone(value: str) -> str:
     """Validate timezone in ±HHmm format."""
-    if not re.match(r"^[+-]?\d{4}$", value):
-        raise ValueError(f"Invalid timezone format: '{value}'. Expected '±HHmm' (e.g. '0800', '-0530')")
-    return value
+    match = re.match(r"^([+-])?(\d{4})$", value.strip())
+    if not match:
+        raise ValueError(f"Invalid timezone format: '{value}'. Expected '±HHmm' (e.g. '+0800', '-0530')")
+    sign = match.group(1)
+    digits = match.group(2)
+    hours, minutes = int(digits[:2]), int(digits[2:])
+    if not (0 <= hours <= 23 and 0 <= minutes <= 59):
+        raise ValueError(f"Invalid timezone: '{value}'. Hours must be 0-23, minutes 0-59")
+    if sign == "-" and hours == 0 and minutes == 0:
+        raise ValueError(f"Invalid timezone: '{value}'. Negative zero is not valid")
+    return value.strip()
 
 
 def validate_number(value: int, min_val: int = 1, max_val: int = 20) -> int:
