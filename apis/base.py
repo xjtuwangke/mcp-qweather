@@ -15,7 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class QWeatherAPIError(Exception):
-    """Exception raised when QWeather API returns an error code."""
+    """Exception raised when QWeather API returns an error code.
+
+    References:
+        https://dev.qweather.com/docs/resource/error-code/
+    """
 
     def __init__(self, code: str, message: Optional[str] = None):
         self.code = code
@@ -24,16 +28,20 @@ class QWeatherAPIError(Exception):
 
     @staticmethod
     def _default_message(code: str) -> str:
+        # QWeather uses two error code versions (v1 and v2).
+        # v1: code field in response body (200=ok, 204=no data, 400+=error)
+        # v2: HTTP status codes with error object in response body
+        # See: https://dev.qweather.com/docs/resource/error-code/
         error_messages = {
-            "200": "Success",
+            "200": "Request successful",
             "204": "No data for the requested location",
-            "400": "Bad request - invalid parameter",
-            "401": "Authentication failed - check API key/credentials",
-            "402": "Over quota - API limit exceeded",
-            "403": "Access denied - no permission",
+            "400": "Bad request — invalid or missing parameter, unsupported location, or data unavailable",
+            "401": "Authentication failed — check API key/credentials",
+            "402": "Over quota — API call limit exceeded",
+            "403": "Access denied — no permission, no credit, overdue payment, security restriction, or invalid host",
             "404": "Unknown location or endpoint",
-            "429": "Too many requests - rate limited",
-            "500": "Internal server error",
+            "429": "Too many requests — rate limited (QPM exceeded or monthly limit reached)",
+            "500": "Internal server error — QWeather service unavailable",
         }
         return error_messages.get(code, f"Unknown error (code: {code})")
 
@@ -210,6 +218,18 @@ class QWeatherAPI:
     """
     Base class for QWeather API clients.
     Provides JWT generation and HTTP request handling.
+
+    Best Practices (implemented):
+      - JWT token cached for 15 min, refreshed before expiry
+      - Gzip compression enabled on all requests
+      - Shared httpx client with connection pooling and timeout
+      - Both v1 and v2 error code formats handled
+
+    References:
+      https://dev.qweather.com/docs/configuration/authentication/
+      https://dev.qweather.com/docs/best-practices/cache/
+      https://dev.qweather.com/docs/best-practices/no-assumptions/
+      https://dev.qweather.com/docs/resource/error-code/
     """
 
     _jwt_token: str = None
@@ -228,6 +248,18 @@ class QWeatherAPI:
             self._private_key = load_pem_private_key(private_key_bytes, password=None)
 
     async def generate_jwt(self) -> str:
+        """Generate JWT token for QWeather API authentication.
+
+        Uses EdDSA (Ed25519) signing with PyJWT. Token expires in 15 minutes,
+        cached until 60 seconds before expiry.
+
+        Note: PyJWT automatically adds 'typ: JWT' to the header, which is
+        compliant with QWeather's JWT spec but is a reserved field that may
+        be used for authentication in the future.
+
+        References:
+            https://dev.qweather.com/docs/configuration/authentication/#json-web-token
+        """
         now = time.time()
         if self._jwt_token and now < self._jwt_expiry - 60:
             return self._jwt_token
@@ -268,10 +300,7 @@ class QWeatherAPI:
         logger.info(f"GET {response.request.url} status={response.status_code}")
 
         if response.status_code != 200:
-            raise QWeatherAPIError(
-                code=str(response.status_code),
-                message=f"HTTP {response.status_code}: {response.text[:200]}"
-            )
+            self._raise_error(response)
 
         data = response.json()
         code = data.get("code", "")
@@ -280,3 +309,29 @@ class QWeatherAPI:
             raise QWeatherAPIError(code=code, message=detail)
 
         return data
+
+    @staticmethod
+    def _raise_error(response):
+        # Try to extract v2 error format: { "error": { "title", "detail", "status" } }
+        # See: https://dev.qweather.com/docs/resource/error-code/
+        try:
+            body = response.json()
+            error_obj = body.get("error", {})
+            title = error_obj.get("title", "")
+            detail = error_obj.get("detail", "")
+            if title and detail:
+                raise QWeatherAPIError(
+                    code=str(response.status_code),
+                    message=f"{title}: {detail}",
+                )
+            if title:
+                raise QWeatherAPIError(
+                    code=str(response.status_code),
+                    message=title,
+                )
+        except (ValueError, AttributeError):
+            pass
+        raise QWeatherAPIError(
+            code=str(response.status_code),
+            message=f"HTTP {response.status_code}: {response.text[:200]}",
+        )
