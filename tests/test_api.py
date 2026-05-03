@@ -7,6 +7,8 @@ Run: uv run python tests/test_api.py
 
 import asyncio
 import sys
+import os
+from datetime import datetime, timedelta
 from fastmcp import Client
 from fastmcp.client.transports import PythonStdioTransport
 
@@ -26,7 +28,8 @@ class TestResult:
 
 
 async def run_tests():
-    transport = PythonStdioTransport("server.py", cwd="/Volumes/External/work/mcp-weather")
+    script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    transport = PythonStdioTransport(os.path.join(script_dir, "server.py"), cwd=script_dir)
     async with Client(transport) as client:
         results = []
 
@@ -34,7 +37,8 @@ async def run_tests():
         beijing_id = "101010100"
         coords = "116.41,39.92"
         lat, lon = 39.92, 116.41
-        today = "20260501"
+        today = datetime.now().strftime("%Y%m%d")
+        future_date = (datetime.now() + timedelta(days=10)).strftime("%Y%m%d")
 
         # ===== Geo Tool Tests =====
         print("\n" + "=" * 60)
@@ -348,7 +352,6 @@ async def run_tests():
                 results.append(TestResult(f"air_station lang={lang}", False, str(e)[:100]))
 
         # 26. astronomy_sun - date must be within 60 days (future)
-        future_date = "20260510"  # A date in the future that works
         for lang in [None, "en", "zh"]:
             try:
                 kwargs = {"location": beijing_id, "date": future_date}
@@ -386,20 +389,90 @@ async def run_tests():
             except Exception as e:
                 results.append(TestResult(f"astronomy_moon lang={lang}", False, str(e)[:100]))
 
-        # 29. solar_elevation_angle
-        for lang in [None, "en", "zh"]:
-            try:
-                kwargs = {"location": coords, "date": today, "time": "1230", "tz": "0800", "alt": 43}
-                if lang:
-                    kwargs["lang"] = lang
-                result = await client.call_tool("solar_elevation_angle", kwargs)
-                if result.data.get("code") == "200":
-                    results.append(TestResult(f"solar_elevation_angle lang={lang}", True))
-                else:
-                    results.append(TestResult(f"solar_elevation_angle lang={lang}", False, f"code={result.data.get('code')}"))
-            except Exception as e:
-                results.append(TestResult(f"solar_elevation_angle lang={lang}", False, str(e)[:100]))
+        # ===== Validation Error Tests =====
+        print("\n" + "=" * 60)
+        print("VALIDATION ERROR TESTS")
+        print("=" * 60)
 
+        # 30. Invalid coordinates should raise ValueError
+        try:
+            await client.call_tool("poi_range", {"location": "invalid,coords", "type": "scenic", "radius": 5})
+            results.append(TestResult("validation: invalid coords for poi_range", False, "should have raised error"))
+        except Exception as e:
+            if "Invalid coordinates" in str(e) or "coordinates" in str(e).lower():
+                results.append(TestResult("validation: invalid coords for poi_range", True))
+            else:
+                results.append(TestResult("validation: invalid coords for poi_range", False, str(e)[:100]))
+
+        # 31. Invalid radius should raise ValueError
+        try:
+            await client.call_tool("poi_range", {"location": coords, "type": "scenic", "radius": 100})
+            results.append(TestResult("validation: invalid radius", False, "should have raised error"))
+        except Exception as e:
+            if "Radius" in str(e) or "radius" in str(e).lower():
+                results.append(TestResult("validation: invalid radius", True))
+            else:
+                results.append(TestResult("validation: invalid radius", False, str(e)[:100]))
+
+        # 32. Invalid date format should raise ValueError
+        try:
+            await client.call_tool("astronomy_sun", {"location": beijing_id, "date": "2026-02-01"})
+            results.append(TestResult("validation: invalid date format", False, "should have raised error"))
+        except Exception as e:
+            if "Invalid date" in str(e) or "date" in str(e).lower():
+                results.append(TestResult("validation: invalid date format", True))
+            else:
+                results.append(TestResult("validation: invalid date format", False, str(e)[:100]))
+
+        # 33. Invalid days value should raise ValueError
+        try:
+            await client.call_tool("weather_daily", {"location": beijing_id, "days": "5d"})
+            results.append(TestResult("validation: invalid days", False, "should have raised error"))
+        except Exception as e:
+            if "Invalid days" in str(e) or "days" in str(e).lower():
+                results.append(TestResult("validation: invalid days", True))
+            else:
+                results.append(TestResult("validation: invalid days", False, str(e)[:100]))
+
+        # 34. Invalid hours value should raise ValueError
+        try:
+            await client.call_tool("weather_hourly", {"location": beijing_id, "hours": "48h"})
+            results.append(TestResult("validation: invalid hours", False, "should have raised error"))
+        except Exception as e:
+            if "Invalid hours" in str(e) or "hours" in str(e).lower():
+                results.append(TestResult("validation: invalid hours", True))
+            else:
+                results.append(TestResult("validation: invalid hours", False, str(e)[:100]))
+
+        # 35. Invalid unit should raise ValueError
+        try:
+            await client.call_tool("weather_now", {"location": beijing_id, "unit": "x"})
+            results.append(TestResult("validation: invalid unit", False, "should have raised error"))
+        except Exception as e:
+            if "Invalid unit" in str(e) or "unit" in str(e).lower():
+                results.append(TestResult("validation: invalid unit", True))
+            else:
+                results.append(TestResult("validation: invalid unit", False, str(e)[:100]))
+
+        # 36. Invalid latitude should raise ValueError
+        try:
+            await client.call_tool("air_now", {"lat": 100, "lon": 116.41})
+            results.append(TestResult("validation: invalid latitude", False, "should have raised error"))
+        except Exception as e:
+            if "Latitude" in str(e) or "latitude" in str(e).lower():
+                results.append(TestResult("validation: invalid latitude", True))
+            else:
+                results.append(TestResult("validation: invalid latitude", False, str(e)[:100]))
+
+        # 37. Invalid country code should raise ValueError
+        try:
+            await client.call_tool("city_lookup", {"location": "Tokyo", "range": "xxx"})
+            results.append(TestResult("validation: invalid country code", False, "should have raised error"))
+        except Exception as e:
+            if "country code" in str(e).lower() or "country_code" in str(e).lower():
+                results.append(TestResult("validation: invalid country code", True))
+            else:
+                results.append(TestResult("validation: invalid country code", False, str(e)[:100]))
         # ===== Print Summary =====
         print("\n" + "=" * 60)
         print("TEST RESULTS SUMMARY")

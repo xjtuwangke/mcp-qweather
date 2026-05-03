@@ -38,8 +38,8 @@ NC='\033[0m' # No Color
 
 REQUIRED_VARS=(
     "QWEATHER_API_HOST"
-    "KEY_ID"
-    "PROJECT_ID"
+    "QWEATHER_KEY_ID"
+    "QWEATHER_PROJECT_ID"
 )
 
 # Path to your private key (mounted into container at /run/secrets/private_key.pem)
@@ -64,20 +64,20 @@ usage() {
     echo "SECRETS INJECTION:"
     echo "  The private key is mounted as a Docker secret at /run/secrets/private_key.pem"
     echo "  Set the following environment variables:"
-    echo "    QWEATHER_API_HOST    Your QWeather API host (e.g., https://xxx.qweatherapi.com)"
-    echo "    KEY_ID               Your JWT key ID"
-    echo "    PROJECT_ID           Your QWeather project ID"
+    echo "    QWEATHER_API_HOST      Your QWeather API host (e.g., https://xxx.qweatherapi.com)"
+    echo "    QWEATHER_KEY_ID        Your JWT key ID"
+    echo "    QWEATHER_PROJECT_ID    Your QWeather project ID"
     echo ""
     echo "  Example:"
     echo "    export QWEATHER_API_HOST=\"https://xxx.qweatherapi.com\""
-    echo "    export KEY_ID=\"your-key-id\""
-    echo "    export PROJECT_ID=\"your-project-id\""
+    echo "    export QWEATHER_KEY_ID=\"your-key-id\""
+    echo "    export QWEATHER_PROJECT_ID=\"your-project-id\""
     echo "    $0 --detach"
     echo ""
     echo "  Or use inline environment variables:"
     echo "    QWEATHER_API_HOST=\"https://xxx.qweatherapi.com\" \\"
-    echo "    KEY_ID=\"your-key-id\" \\"
-    echo "    PROJECT_ID=\"your-project-id\" \\"
+    echo "    QWEATHER_KEY_ID=\"your-key-id\" \\"
+    echo "    QWEATHER_PROJECT_ID=\"your-project-id\" \\"
     echo "    $0 --detach"
 }
 
@@ -192,8 +192,8 @@ docker run \
     -p "${PORT}:8000" \
     -v "${SCRIPT_DIR}/${PRIVATE_KEY_PATH}:/run/secrets/private_key.pem:ro" \
     -e QWEATHER_API_HOST \
-    -e KEY_ID \
-    -e PROJECT_ID \
+    -e QWEATHER_KEY_ID \
+    -e QWEATHER_PROJECT_ID \
     -e PYTHONUNBUFFERED=1 \
     mcp-weather:latest
 
