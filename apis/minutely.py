@@ -47,14 +47,10 @@ class MinutelyAPI(QWeatherAPI):
             dict: {"code": "200", "daily": [{"date": "2026-05-01", "type": "3", "name": "Clothing Index", "level": "4", "category": "Moderate", "text": "Wear a light jacket."}]}
         """
         params = {"location": location, "type": type}
-        if days:
-            path = f"/v7/indices/{days}"
-        else:
-            path = "/v7/indices/1d"
         lang = validate_lang(lang)
         if lang:
             params["lang"] = lang
-        return await self._request(path, params)
+        return await self._request(f"/v7/indices/{days}", params)
 
     async def air_now(self, lat: float, lon: float, lang: str = None) -> dict:
         """
