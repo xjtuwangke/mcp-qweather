@@ -10,6 +10,16 @@ logging.basicConfig(
     datefmt="%Y-%m-%d %H:%M:%S"
 )
 
+uvicorn_logger = logging.getLogger("uvicorn.access")
+uvicorn_logger.handlers.clear()
+uvicorn_handler = logging.StreamHandler(sys.stdout)
+uvicorn_handler.setFormatter(logging.Formatter(
+    fmt="%(asctime)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S"
+))
+uvicorn_logger.addHandler(uvicorn_handler)
+uvicorn_logger.setLevel(logging.INFO)
+
 from fastmcp import FastMCP
 
 from apis.geo import GeoAPI
