@@ -14,7 +14,7 @@ A **Weather MCP (Model Context Protocol) Server** built with **FastMCP** that wr
 ```
 .
 ├── apis/                        # Core API client library
-│   ├── __init__.py              # Exports GeoAPI only
+│   ├── __init__.py              # Exports GeoAPI, WeatherAPI, MinutelyAPI
 │   ├── base.py                  # QWeatherAPI base class, JWT auth, 17 validators
 │   ├── geo.py                   # GeoAPI — city_lookup, poi_lookup, poi_range
 │   ├── weather.py               # WeatherAPI — 6 weather endpoints (now/daily/hourly/grid)
@@ -24,12 +24,13 @@ A **Weather MCP (Model Context Protocol) Server** built with **FastMCP** that wr
 │   ├── ed25519-public.pem       # Ed25519 public key (committed)
 │   └── ed25519-private.pem      # Private key (gitignored)
 ├── tests/
-│   └── test_api.py              # ~37 test cases using fastmcp.Client + PythonStdioTransport
-├── server.py                    # MCP server entry point — 15 tools, 2 transport modes
+│   └── test_api.py              # Comprehensive test suite (~61 cases)
+├── server.py                    # MCP server entry point — 18 tools, 2 transport modes
 ├── config.py                    # pydantic-settings configuration from .env
-├── test_client.py               # Simple MCP client example (outdated)
-├── pyproject.toml               # uv project config, 6 deps
+├── test_client.py               # Simple MCP client example
+├── pyproject.toml               # uv project config, 5 deps
 ├── uv.lock                      # Locked dependency versions
+├── .dockerignore                # Docker build exclusions
 ├── Dockerfile                   # Python 3.13-slim, HTTP mode
 ├── docker-compose.yaml          # Port 28001:8000, secret mount, .env
 ├── docker-run.sh                # 203-line bash deploy script
@@ -44,7 +45,7 @@ A **Weather MCP (Model Context Protocol) Server** built with **FastMCP** that wr
 | `uv sync` | Install dependencies |
 | `uv run python server.py` | Run server in **stdio mode** |
 | `uv run python server.py --http` | Run server in **HTTP mode** (0.0.0.0:8000) |
-| `uv run python tests/test_api.py` | Run full test suite (~37 tests) |
+| `uv run python tests/test_api.py` | Run full test suite (~61 tests) |
 | `./docker-run.sh --detach` | Build & run Docker container |
 | `docker-compose up -d` | Run via Docker Compose |
 
@@ -84,13 +85,13 @@ Uses `pydantic-settings` with `BaseSettings`. Reads from `.env` file automatical
 
 ### Server Logging
 
-`LoggingFastMCP` (subclass of `FastMCP`, `server.py:61`) overrides `call_tool()` to log every tool invocation including invalid/unknown tools. Both app logger and uvicorn access logger are configured with timestamp format.
+`LoggingFastMCP` (subclass of `FastMCP`, `server.py:43`) overrides `call_tool()` to log every tool invocation including invalid/unknown tools. Both app logger and uvicorn access logger are configured with timestamp format.
 
-### 15 MCP Tools
+### 18 MCP Tools
 
 **Geo (3)**: `city_lookup`, `poi_lookup`, `poi_range`
 **Weather (6)**: `weather_now`, `weather_daily`, `weather_hourly`, `grid_weather_now`, `grid_weather_daily`, `grid_weather_hourly`
-**Minutely/Air/Astro (6)**: `minutely_precipitation`, `indices_forecast`, `air_now`, `air_hourly`, `air_daily`, `air_station`, `astronomy_sun`, `astronomy_moon`, `solar_elevation_angle`
+**Minutely/Air/Astro (9)**: `minutely_precipitation`, `indices_forecast`, `air_now`, `air_hourly`, `air_daily`, `air_station`, `astronomy_sun`, `astronomy_moon`, `solar_elevation_angle`
 
 ### Input Validation (`apis/base.py`)
 
@@ -99,9 +100,9 @@ All input validation happens at the tool layer (in `server.py` tool decorators),
 - `validate_coordinates()` — regex for `lon,lat` format
 - `validate_location_id()` — alphanumeric
 - `validate_days/hours()` — against allowed tuple sets
-- `validate_date()` — yyyyMMdd format
+- `validate_date()` — yyyyMMdd format and calendar validity
 - `validate_time()` — HHmm (24h)
-- `validate_timezone()` — ±HHmm
+- `validate_timezone()` — ±HHmm with valid hour/minute ranges
 - `validate_number/radius/altitude/latitude/longitude()` — range checks
 - `validate_lang()` — normalizes to "zh" or "en"
 - `validate_unit()` — "m" or "i"
@@ -131,8 +132,7 @@ Tests are run with: `uv run python tests/test_api.py`
 | Package | Purpose |
 |---------|---------|
 | `fastmcp` | MCP server framework |
-| `httpx` | Async HTTP client for QWeather API |
-| `PyJWT` | (Listed but not used — JWT is manually constructed in `base.py`) |
+| `httpx` | Async HTTP client for QWeather API (shared instance with connection pool) |
 | `cryptography` | Ed25519 private key loading and signing |
 | `pydantic-settings` | .env-based configuration |
-| `python-dotenv` | .env file loading |
+| `python-dotenv` | .env file loading (required by pydantic-settings for env_file support) |
