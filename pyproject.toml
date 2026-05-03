@@ -3,6 +3,6 @@ name = "mcp-weather"
 version = "0.1.0"
 description = "Weather forecast MCP server using QWeather API"
 requires-python = ">=3.13"
-dependencies = ["fastmcp", "httpx", "PyJWT", "cryptography", "pydantic-settings", "python-dotenv"]
+dependencies = ["fastmcp>=3.0.0", "httpx", "PyJWT>=2.8.0", "cryptography", "pydantic-settings", "python-dotenv"]
 
 [dependency-groups]

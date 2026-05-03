@@ -567,10 +567,10 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "cryptography" },
-    { name = "fastmcp" },
+    { name = "fastmcp", specifier = ">=3.0.0" },
     { name = "httpx" },
     { name = "pydantic-settings" },
-    { name = "pyjwt" },
+    { name = "pyjwt", specifier = ">=2.8.0" },
     { name = "python-dotenv" },
 ]
 
