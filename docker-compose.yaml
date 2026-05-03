@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: mcp-weather
     ports:
-      - "8000:8000"
+      - "28001:8000"
     env_file:
       - path: .env
         required: true
@@ -14,4 +14,10 @@ services:
       - TZ=${TZ:-Asia/Shanghai}
     volumes:
       - ./keys/ed25519-private.pem:/run/secrets/private_key.pem:ro
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.socket(); s.settimeout(5); s.connect(('localhost',8000)); s.close()"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     restart: unless-stopped
