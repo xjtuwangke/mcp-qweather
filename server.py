@@ -3,6 +3,7 @@ os.environ.setdefault("TZ", os.environ.get("TZ", "Asia/Shanghai"))
 
 import logging
 import sys
+from functools import partial
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,6 +22,7 @@ uvicorn_logger.addHandler(uvicorn_handler)
 uvicorn_logger.setLevel(logging.INFO)
 
 from fastmcp import FastMCP
+from fastmcp.exceptions import NotFoundError
 
 from apis.geo import GeoAPI
 from apis.weather import WeatherAPI
@@ -29,7 +31,38 @@ from apis.minutely import MinutelyAPI
 logger = logging.getLogger(__name__)
 
 
-mcp = FastMCP("Weather MCP")
+class LoggingMiddleware:
+    """Middleware to log all tool call attempts including unknown tools."""
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, context, call_next):
+        if hasattr(context.message, 'name'):
+            tool_name = context.message.name
+            tool_args = getattr(context.message, 'arguments', {}) or {}
+            logger.info(f"[tool] {tool_name}({tool_args})")
+        try:
+            return await call_next(context)
+        except NotFoundError:
+            if hasattr(context.message, 'name'):
+                logger.error(f"[tool] {context.message.name} - tool not found")
+            raise
+
+
+class LoggingFastMCP(FastMCP):
+    """FastMCP subclass that logs all tool calls including unknown tools."""
+
+    async def call_tool(self, name, arguments=None, **kwargs):
+        logger.info(f"[tool] {name}({arguments or {}})")
+        try:
+            return await super().call_tool(name, arguments, **kwargs)
+        except NotFoundError:
+            logger.error(f"[tool] {name} - tool not found")
+            raise
+
+
+mcp = LoggingFastMCP("Weather MCP")
 geo_api = GeoAPI()
 weather_api = WeatherAPI()
 minutely_api = MinutelyAPI()
