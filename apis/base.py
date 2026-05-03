@@ -1,3 +1,4 @@
+import asyncio
 import httpx
 import time
 import base64
@@ -203,6 +204,7 @@ class QWeatherAPI:
     def __init__(self, api_host: str = None):
         self.api_host = api_host or settings.qweather_api_host
         self._private_key = None
+        self._http_client = None
 
     def _load_private_key(self):
         """Load private key once and cache it."""
@@ -211,54 +213,66 @@ class QWeatherAPI:
             private_key_bytes = Path(settings.private_key_path).read_bytes()
             self._private_key = load_pem_private_key(private_key_bytes, password=None)
 
-    def generate_jwt(self) -> str:
+    async def generate_jwt(self) -> str:
         now = time.time()
         if self._jwt_token and now < self._jwt_expiry - 60:
             return self._jwt_token
 
         self._load_private_key()
 
-        header_dict = {"alg": "EdDSA", "kid": settings.key_id}
-        header_base64 = base64.urlsafe_b64encode(json.dumps(header_dict).encode()).decode().rstrip("=")
+        def _build_token():
+            header_dict = {"alg": "EdDSA", "kid": settings.key_id}
+            header_base64 = base64.urlsafe_b64encode(json.dumps(header_dict).encode()).decode().rstrip("=")
 
-        iat = int(now) - 30
-        exp = int(now) + 900
-        payload_dict = {
-            "iat": iat,
-            "exp": exp,
-            "sub": settings.project_id
-        }
-        body_base64 = base64.urlsafe_b64encode(json.dumps(payload_dict).encode()).decode().rstrip("=")
+            iat = int(now) - 30
+            exp = int(now) + 900
+            payload_dict = {
+                "iat": iat,
+                "exp": exp,
+                "sub": settings.project_id
+            }
+            body_base64 = base64.urlsafe_b64encode(json.dumps(payload_dict).encode()).decode().rstrip("=")
 
-        signing_input = f"{header_base64}.{body_base64}"
-        signature = self._private_key.sign(signing_input.encode())
-        signature_base64 = base64.urlsafe_b64encode(signature).decode().rstrip("=")
+            signing_input = f"{header_base64}.{body_base64}"
+            signature = self._private_key.sign(signing_input.encode())
+            signature_base64 = base64.urlsafe_b64encode(signature).decode().rstrip("=")
 
-        self._jwt_token = f"{signing_input}.{signature_base64}"
-        self._jwt_expiry = exp
+            return f"{signing_input}.{signature_base64}"
+
+        self._jwt_token = await asyncio.to_thread(_build_token)
+        self._jwt_expiry = int(now) + 900
         return self._jwt_token
+
+    def _get_http_client(self) -> httpx.AsyncClient:
+        if self._http_client is None or self._http_client.is_closed:
+            self._http_client = httpx.AsyncClient(
+                headers={"Accept-Encoding": "gzip"}
+            )
+        return self._http_client
+
+    async def close(self):
+        if self._http_client and not self._http_client.is_closed:
+            await self._http_client.aclose()
 
     async def _request(self, path: str, params: dict) -> dict:
         url = f"{self.api_host}{path}"
-        headers = {
-            "Authorization": f"Bearer {self.generate_jwt()}",
-            "Accept-Encoding": "gzip"
-        }
+        token = await self.generate_jwt()
+        headers = {"Authorization": f"Bearer {token}"}
         logger.info(f"GET {url} params={params}")
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, headers=headers, params=params)
-            logger.info(f"GET {response.request.url} status={response.status_code}")
+        client = self._get_http_client()
+        response = await client.get(url, headers=headers, params=params)
+        logger.info(f"GET {response.request.url} status={response.status_code}")
 
-            if response.status_code != 200:
-                raise QWeatherAPIError(
-                    code=str(response.status_code),
-                    message=f"HTTP {response.status_code}: {response.text[:200]}"
-                )
+        if response.status_code != 200:
+            raise QWeatherAPIError(
+                code=str(response.status_code),
+                message=f"HTTP {response.status_code}: {response.text[:200]}"
+            )
 
-            data = response.json()
-            code = data.get("code", "")
-            if code and code != "200":
-                detail = data.get("status", data.get("message", str(data)[:200]))
-                raise QWeatherAPIError(code=code, message=detail)
+        data = response.json()
+        code = data.get("code", "")
+        if code and code != "200":
+            detail = data.get("status", data.get("message", str(data)[:200]))
+            raise QWeatherAPIError(code=code, message=detail)
 
-            return data
+        return data
