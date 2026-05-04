@@ -43,8 +43,8 @@ A **Weather MCP (Model Context Protocol) Server** built with **FastMCP** that wr
 | Command | Purpose |
 |---------|---------|
 | `uv sync` | Install dependencies |
-| `uv run python server.py` | Run server in **stdio mode** |
-| `uv run python server.py --http` | Run server in **HTTP mode** (0.0.0.0:8000) |
+| `uv run python server.py --stdio` | Run server in **stdio mode** |
+| `uv run python server.py` | Run server in **HTTP mode** (0.0.0.0:8000, default for Docker) |
 | `uv run python tests/test_api.py` | Run full test suite (~61 tests) |
 | `./docker-run.sh --detach` | Build & run Docker container |
 | `docker-compose up -d` | Run via Docker Compose |
@@ -53,8 +53,8 @@ A **Weather MCP (Model Context Protocol) Server** built with **FastMCP** that wr
 
 ### Transport Modes
 
-- **Stdio** (default): `mcp.run(transport="stdio")` — for local MCP clients
-- **HTTP**: `mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)` — for remote access / Docker
+- **Stdio**: `mcp.run(transport="stdio")` — for local MCP clients
+- **HTTP** (default): `mcp.run(transport="streamable-http", host="0.0.0.0", port=8000)` — for remote access / Docker
 
 ### API Client Hierarchy
 
