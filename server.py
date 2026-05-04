@@ -434,4 +434,11 @@ if __name__ == "__main__":
     if "--stdio" in sys.argv:
         mcp.run(transport="stdio")
     else:
+        from starlette.responses import JSONResponse
+        from starlette.requests import Request
+
+        @mcp.custom_route("/.well-known/health", methods=["GET"])
+        async def health_check(request: Request):
+            return JSONResponse({"status": "ok"})
+
         mcp.run(transport="streamable-http", host="0.0.0.0", port=8000, show_banner=True)
