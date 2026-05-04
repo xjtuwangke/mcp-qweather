@@ -240,7 +240,6 @@ class QWeatherAPI:
     def __init__(self, api_host: str = None):
         self.api_host = api_host or settings.qweather_api_host
         self._private_key = None
-        self._http_client = None
 
     def _load_private_key(self):
         """Load private key once and cache it."""
@@ -281,16 +280,12 @@ class QWeatherAPI:
         return self._jwt_token
 
     def _get_http_client(self) -> httpx.AsyncClient:
-        if self._http_client is None or self._http_client.is_closed:
-            self._http_client = httpx.AsyncClient(
-                headers={"Accept-Encoding": "gzip"},
-                timeout=10.0,
-            )
-        return self._http_client
+        from apis import get_shared_http_client
+        return get_shared_http_client()
 
     async def close(self):
-        if self._http_client and not self._http_client.is_closed:
-            await self._http_client.aclose()
+        from apis import close_shared_http_client
+        await close_shared_http_client()
 
     async def _request(self, path: str, params: dict) -> dict:
         url = f"{self.api_host}{path}"
