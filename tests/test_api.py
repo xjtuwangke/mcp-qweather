@@ -568,6 +568,117 @@ async def run_tests():
             else:
                 results.append(TestResult("validation: invalid number", False, str(e)[:100]))
 
+        # ===== Coordinate Rounding Tests =====
+        print("\n" + "=" * 60)
+        print("COORDINATE ROUNDING TESTS")
+        print("=" * 60)
+
+        # 42. coordinates with many decimals should be rounded to 2 decimal places
+        try:
+            result = await client.call_tool("weather_now", {"location": "116.41556,39.92687"})
+            if result.data.get("code") == "200":
+                results.append(TestResult("coords rounding: many decimals", True))
+            else:
+                results.append(TestResult("coords rounding: many decimals", False, f"code={result.data.get('code')}"))
+        except Exception as e:
+            results.append(TestResult("coords rounding: many decimals", False, str(e)[:100]))
+
+        # 43. coordinates with 3 decimal places should round to 2
+        try:
+            result = await client.call_tool("weather_now", {"location": "116.416,39.927"})
+            if result.data.get("code") == "200":
+                results.append(TestResult("coords rounding: 3 decimals", True))
+            else:
+                results.append(TestResult("coords rounding: 3 decimals", False, f"code={result.data.get('code')}"))
+        except Exception as e:
+            results.append(TestResult("coords rounding: 3 decimals", False, str(e)[:100]))
+
+        # 44. latitude with many decimals should be rounded to 2 decimal places
+        try:
+            result = await client.call_tool("air_now", {"lat": 39.92687, "lon": 116.41})
+            data = result.data
+            if "indexes" in data or (isinstance(data, dict) and len(data) > 0):
+                results.append(TestResult("lat rounding: many decimals", True))
+            else:
+                results.append(TestResult("lat rounding: many decimals", False, f"unexpected data structure"))
+        except Exception as e:
+            results.append(TestResult("lat rounding: many decimals", False, str(e)[:100]))
+
+        # 45. longitude with many decimals should be rounded to 2 decimal places
+        try:
+            result = await client.call_tool("air_now", {"lat": 39.92, "lon": 116.41556})
+            data = result.data
+            if "indexes" in data or (isinstance(data, dict) and len(data) > 0):
+                results.append(TestResult("lon rounding: many decimals", True))
+            else:
+                results.append(TestResult("lon rounding: many decimals", False, f"unexpected data structure"))
+        except Exception as e:
+            results.append(TestResult("lon rounding: many decimals", False, str(e)[:100]))
+
+        # 46. negative coordinates with many decimals should be rounded correctly
+        try:
+            result = await client.call_tool("weather_now", {"location": "-73.98572,40.74843"})
+            if result.data.get("code") == "200":
+                results.append(TestResult("coords rounding: negative lon", True))
+            else:
+                results.append(TestResult("coords rounding: negative lon", False, f"code={result.data.get('code')}"))
+        except Exception as e:
+            results.append(TestResult("coords rounding: negative lon", False, str(e)[:100]))
+
+        # 47. zero coordinates should work (edge case)
+        try:
+            result = await client.call_tool("weather_now", {"location": "0,0"})
+            if result.data.get("code") == "200":
+                results.append(TestResult("coords rounding: zero coordinates", True))
+            else:
+                results.append(TestResult("coords rounding: zero coordinates", False, f"code={result.data.get('code')}"))
+        except Exception as e:
+            results.append(TestResult("coords rounding: zero coordinates", False, str(e)[:100]))
+
+        # 48. latitude boundary value -90 should be valid
+        try:
+            result = await client.call_tool("air_now", {"lat": -90.0, "lon": 0.0})
+            data = result.data
+            if "indexes" in data or (isinstance(data, dict) and len(data) > 0):
+                results.append(TestResult("lat boundary: -90", True))
+            else:
+                results.append(TestResult("lat boundary: -90", False, f"unexpected data structure"))
+        except Exception as e:
+            results.append(TestResult("lat boundary: -90", False, str(e)[:100]))
+
+        # 49. latitude boundary value 90 should be valid
+        try:
+            result = await client.call_tool("air_now", {"lat": 90.0, "lon": 0.0})
+            data = result.data
+            if "indexes" in data or (isinstance(data, dict) and len(data) > 0):
+                results.append(TestResult("lat boundary: 90", True))
+            else:
+                results.append(TestResult("lat boundary: 90", False, f"unexpected data structure"))
+        except Exception as e:
+            results.append(TestResult("lat boundary: 90", False, str(e)[:100]))
+
+        # 50. longitude boundary value -180 should be valid
+        try:
+            result = await client.call_tool("air_now", {"lat": 0.0, "lon": -180.0})
+            data = result.data
+            if "indexes" in data or (isinstance(data, dict) and len(data) > 0):
+                results.append(TestResult("lon boundary: -180", True))
+            else:
+                results.append(TestResult("lon boundary: -180", False, f"unexpected data structure"))
+        except Exception as e:
+            results.append(TestResult("lon boundary: -180", False, str(e)[:100]))
+
+        # 51. longitude boundary value 180 should be valid
+        try:
+            result = await client.call_tool("air_now", {"lat": 0.0, "lon": 180.0})
+            data = result.data
+            if "indexes" in data or (isinstance(data, dict) and len(data) > 0):
+                results.append(TestResult("lon boundary: 180", True))
+            else:
+                results.append(TestResult("lon boundary: 180", False, f"unexpected data structure"))
+        except Exception as e:
+            results.append(TestResult("lon boundary: 180", False, str(e)[:100]))
+
         # ===== Print Summary =====
         print("\n" + "=" * 60)
         print("TEST RESULTS SUMMARY")

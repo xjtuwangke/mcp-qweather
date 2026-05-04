@@ -83,14 +83,14 @@ def validate_lang(lang: Optional[str] = None) -> Optional[str]:
 
 
 def validate_coordinates(value: str) -> tuple[float, float]:
-    """Validate coordinates in 'lon,lat' format. Returns (lon, lat)."""
-    pattern = r"^(-?\d{1,3}(?:\.\d{1,2})?),(-?\d{1,2}(?:\.\d{1,2})?)$"
+    """Validate coordinates in 'lon,lat' format. Returns (lon, lat) rounded to 2 decimal places."""
+    pattern = r"^(-?\d{1,3}(?:\.\d*)?),(-?\d{1,2}(?:\.\d*)?)$"
     match = re.match(pattern, value.strip())
     if not match:
         raise ValueError(
             f"Invalid coordinates format: '{value}'. Expected 'lon,lat' (e.g. '116.41,39.92')"
         )
-    lon, lat = float(match.group(1)), float(match.group(2))
+    lon, lat = round(float(match.group(1)), 2), round(float(match.group(2)), 2)
     if not (-180 <= lon <= 180):
         raise ValueError(f"Longitude must be between -180 and 180, got {lon}")
     if not (-90 <= lat <= 90):
@@ -201,17 +201,19 @@ def is_coordinate_location(value: str) -> bool:
 
 
 def validate_latitude(lat: float) -> float:
-    """Validate latitude value."""
-    if not (-90 <= lat <= 90):
+    """Validate latitude value, rounded to 2 decimal places."""
+    lat_rounded = round(lat, 2)
+    if not (-90 <= lat_rounded <= 90):
         raise ValueError(f"Latitude must be between -90 and 90, got {lat}")
-    return lat
+    return lat_rounded
 
 
 def validate_longitude(lon: float) -> float:
-    """Validate longitude value."""
-    if not (-180 <= lon <= 180):
+    """Validate longitude value, rounded to 2 decimal places."""
+    lon_rounded = round(lon, 2)
+    if not (-180 <= lon_rounded <= 180):
         raise ValueError(f"Longitude must be between -180 and 180, got {lon}")
-    return lon
+    return lon_rounded
 
 
 class QWeatherAPI:
