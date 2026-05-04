@@ -9,4 +9,7 @@ dependencies = ["fastmcp>=3.0.0", "httpx", "PyJWT>=2.8.0", "cryptography", "pyda
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.setuptools]
+packages = ["apis"]
+
 [dependency-groups]
