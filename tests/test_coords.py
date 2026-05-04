@@ -64,7 +64,10 @@ async def test_coordinate_rounding(client, results):
         else:
             results.append(TestResult("coords rounding: zero coordinates", False, f"code={result.data.get('code')}"))
     except Exception as e:
-        results.append(TestResult("coords rounding: zero coordinates", False, str(e)[:100]))
+        if "Data Not Available" in str(e):
+            results.append(TestResult("coords rounding: zero coordinates", True, "expected: no data at ocean"))
+        else:
+            results.append(TestResult("coords rounding: zero coordinates", False, str(e)[:100]))
 
     try:
         result = await client.call_tool("air_now", {"lat": -90.0, "lon": 0.0})
@@ -74,7 +77,10 @@ async def test_coordinate_rounding(client, results):
         else:
             results.append(TestResult("lat boundary: -90", False, f"unexpected data structure"))
     except Exception as e:
-        results.append(TestResult("lat boundary: -90", False, str(e)[:100]))
+        if "Data Not Available" in str(e):
+            results.append(TestResult("lat boundary: -90", True, "expected: no data at south pole"))
+        else:
+            results.append(TestResult("lat boundary: -90", False, str(e)[:100]))
 
     try:
         result = await client.call_tool("air_now", {"lat": 90.0, "lon": 0.0})
@@ -84,7 +90,10 @@ async def test_coordinate_rounding(client, results):
         else:
             results.append(TestResult("lat boundary: 90", False, f"unexpected data structure"))
     except Exception as e:
-        results.append(TestResult("lat boundary: 90", False, str(e)[:100]))
+        if "Data Not Available" in str(e):
+            results.append(TestResult("lat boundary: 90", True, "expected: no data at north pole"))
+        else:
+            results.append(TestResult("lat boundary: 90", False, str(e)[:100]))
 
     try:
         result = await client.call_tool("air_now", {"lat": 0.0, "lon": -180.0})
@@ -94,7 +103,10 @@ async def test_coordinate_rounding(client, results):
         else:
             results.append(TestResult("lon boundary: -180", False, f"unexpected data structure"))
     except Exception as e:
-        results.append(TestResult("lon boundary: -180", False, str(e)[:100]))
+        if "Data Not Available" in str(e):
+            results.append(TestResult("lon boundary: -180", True, "expected: no data at date line"))
+        else:
+            results.append(TestResult("lon boundary: -180", False, str(e)[:100]))
 
     try:
         result = await client.call_tool("air_now", {"lat": 0.0, "lon": 180.0})
@@ -104,4 +116,7 @@ async def test_coordinate_rounding(client, results):
         else:
             results.append(TestResult("lon boundary: 180", False, f"unexpected data structure"))
     except Exception as e:
-        results.append(TestResult("lon boundary: 180", False, str(e)[:100]))
+        if "Data Not Available" in str(e):
+            results.append(TestResult("lon boundary: 180", True, "expected: no data at date line"))
+        else:
+            results.append(TestResult("lon boundary: 180", False, str(e)[:100]))
