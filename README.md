@@ -107,7 +107,7 @@ from fastmcp import Client
 from fastmcp.client.transports import PythonStdioTransport
 
 async def main():
-    transport = PythonStdioTransport("server.py", cwd="/path/to/mcp-weather")
+    transport = PythonStdioTransport("server.py", args=["--stdio"], cwd="/path/to/mcp-weather")
     async with Client(transport) as client:
         result = await client.call_tool("weather_now", {"location": "101010100"})
         print(result.data)

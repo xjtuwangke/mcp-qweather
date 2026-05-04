@@ -22,7 +22,7 @@ import test_coords
 
 async def run_tests():
     script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    transport = PythonStdioTransport(os.path.join(script_dir, "server.py"), cwd=script_dir)
+    transport = PythonStdioTransport(os.path.join(script_dir, "server.py"), args=["--stdio"], cwd=script_dir)
     async with Client(transport) as client:
         results = []
 
