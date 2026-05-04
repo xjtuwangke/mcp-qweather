@@ -137,6 +137,25 @@ Tests are run with: `uv run python tests/test_api.py`
 - API methods pass params as-is to `_request()` without extra processing
 - JWT token generation happens in `generate_jwt()`, called from `_request()` with caching
 
+## Agent Constraints
+
+### Git Commit Policy
+
+1. **Do NOT commit code without human confirmation.** Unless explicitly instructed to commit by the user (e.g. "commit", "提交", "commit and push"), agents must NOT run `git commit`. Always ask for confirmation before committing.
+
+2. **Pre-commit checks are mandatory for code changes.** Before any `git commit` involving code changes, the following must pass:
+   - Full test suite: `uv run python tests/test_api.py`
+   - Docker build: `docker compose build` (or `docker build -t mcp-qweather .`)
+
+3. If either check fails, fix the issue and run both checks again before committing.
+
+### Exceptions
+
+The following do NOT require pre-commit checks (they don't involve code changes):
+- Documentation-only changes (README.md, AGENTS.md itself)
+- Configuration file edits (.gitignore, .dockerignore, .env.example)
+- Dockerfile or docker-compose.yaml changes — only Docker build check is required, tests optional
+
 ## Dependencies
 
 | Package | Purpose |
